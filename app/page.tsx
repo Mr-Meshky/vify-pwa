@@ -1,6 +1,7 @@
 import { SubscriptionCard } from "@/components/subscription-card";
 import { AboutSection } from "@/components/about-section";
 import { Shield } from "lucide-react";
+import { LastCommitTime } from "@/components/last-commit-time";
 
 const subscriptions = [
   {
@@ -62,9 +63,12 @@ export default function Home() {
 
         {/* Subscription List */}
         <section className="mb-6">
-          <h2 className="mb-4 text-sm font-medium text-muted-foreground">
-            سابسکریپشن‌ها
-          </h2>
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-sm font-medium text-muted-foreground">
+              سابسکریپشن‌ها
+            </h2>
+            <LastCommitTime />
+          </div>
           <div className="space-y-3">
             {subscriptions.map((sub, index) => (
               <SubscriptionCard
