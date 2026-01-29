@@ -39,24 +39,6 @@ const subscriptions = [
     icon: "ss",
     description: "پروتکل Shadowsocks",
   },
-  {
-    name: "Hysteria 2",
-    url: "https://raw.githubusercontent.com/Mr-Meshky/vify/main/configs/hysteria2.txt",
-    icon: "hysteria2",
-    description: "Hysteria v2 (UDP)",
-  },
-  {
-    name: "HY2",
-    url: "https://raw.githubusercontent.com/Mr-Meshky/vify/main/configs/hy2.txt",
-    icon: "hy2",
-    description: "HY2 (Minimal)",
-  },
-  {
-    name: "HTTPS",
-    url: "https://raw.githubusercontent.com/Mr-Meshky/vify/main/configs/https.txt",
-    icon: "https",
-    description: "HTTPS Proxy",
-  },
 ];
 
 export default function Home() {
