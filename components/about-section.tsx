@@ -149,7 +149,7 @@ export function AboutSection() {
                   mrmeshky.ir
                 </a>
                 <a
-                  href="https://github.com/ShatakVPN/ConfigForge-V2Ray"
+                  href="https://github.com/Mr-Meshky/vify"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 rounded-xl bg-secondary px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary/80 active:bg-secondary/60"
