@@ -19,7 +19,7 @@ interface CategoryResult {
 }
 
 // Constants
-const countGetConfigOfEveryChannel = 2;
+const DEFAULT_MESSAGE_COUNT = 5;
 const countryFlagMap: Record<string, string> = {
   AF: "AF", AL: "AL", DZ: "DZ", AD: "AD", AO: "AO", AG: "AG", AR: "AR", AM: "AM",
   AU: "AU", AT: "AT", AZ: "AZ", BS: "BS", BH: "BH", BD: "BD", BB: "BB", BY: "BY",
@@ -144,7 +144,8 @@ async function configChanger(urlString: string): Promise<FinalResult | null> {
 
 async function fetchChannelConfigs(
   channel: string,
-  result: CategoryResult
+  result: CategoryResult,
+  messageCount: number = DEFAULT_MESSAGE_COUNT
 ): Promise<void> {
   const url = `https://t.me/s/${channel}`;
 
@@ -176,7 +177,7 @@ async function fetchChannelConfigs(
       return;
     }
 
-    const lastConfigs = matches.slice(-countGetConfigOfEveryChannel);
+    const lastConfigs = matches.slice(-messageCount);
 
     for (const element of lastConfigs) {
       const decodeHtml = decodeHtmlEntities(element);
@@ -221,6 +222,10 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const channels: string[] = body.channels;
+    const messageCount: number = Math.min(
+      50,
+      Math.max(1, body.messageCount || DEFAULT_MESSAGE_COUNT)
+    );
 
     if (!channels || !Array.isArray(channels) || channels.length === 0) {
       return NextResponse.json(
@@ -246,7 +251,7 @@ export async function POST(request: NextRequest) {
 
     // Process channels sequentially to avoid rate limiting
     for (const channel of channels) {
-      await fetchChannelConfigs(channel.trim(), result);
+      await fetchChannelConfigs(channel.trim(), result, messageCount);
       // Small delay between channels to avoid rate limiting
       await new Promise((resolve) => setTimeout(resolve, 500));
     }

@@ -16,8 +16,11 @@ import {
   Server,
   Layers,
   AlertCircle,
+  ExternalLink,
+  MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
+import { Input } from "@/components/ui/input";
 
 interface CategoryResult {
   protocol: Record<string, string[]>;
@@ -41,6 +44,7 @@ interface ScanResult {
 
 export default function ScannerPage() {
   const [channels, setChannels] = useState("");
+  const [messageCount, setMessageCount] = useState(5);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ScanResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -74,7 +78,7 @@ export default function ScannerPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ channels: channelList }),
+        body: JSON.stringify({ channels: channelList, messageCount }),
       });
 
       const data = await response.json();
@@ -179,6 +183,24 @@ export default function ScannerPage() {
           </div>
         </header>
 
+        {/* Suggested Channels Link */}
+        <Card className="mb-4 border-primary/30 bg-primary/5">
+          <CardContent className="flex items-center justify-between py-3">
+            <span className="text-sm text-foreground">
+              لیست پیشنهادی کانال‌ها
+            </span>
+            <a
+              href="https://t.me/MrMeshkyChannel/1959"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              <ExternalLink className="h-4 w-4" />
+              مشاهده
+            </a>
+          </CardContent>
+        </Card>
+
         {/* Input Section */}
         <Card className="mb-6">
           <CardHeader>
@@ -192,6 +214,47 @@ export default function ScannerPage() {
               className="min-h-32 font-mono text-sm"
               dir="ltr"
             />
+            
+            {/* Message Count Input */}
+            <div className="flex items-center gap-3 rounded-lg bg-secondary/50 p-3">
+              <MessageSquare className="h-5 w-5 text-muted-foreground" />
+              <div className="flex-1">
+                <label className="mb-1 block text-sm font-medium text-foreground">
+                  تعداد پیام آخر
+                </label>
+                <p className="text-xs text-muted-foreground">
+                  چند پیام آخر هر کانال بررسی شود؟
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                {[2, 5, 10, 20].map((num) => (
+                  <button
+                    key={num}
+                    onClick={() => setMessageCount(num)}
+                    className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                      messageCount === num
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                    }`}
+                  >
+                    {num}
+                  </button>
+                ))}
+                <Input
+                  type="number"
+                  value={messageCount}
+                  onChange={(e) =>
+                    setMessageCount(
+                      Math.max(1, Math.min(50, parseInt(e.target.value) || 1))
+                    )
+                  }
+                  className="w-16 text-center font-mono"
+                  min={1}
+                  max={50}
+                />
+              </div>
+            </div>
+
             <Button
               onClick={handleScan}
               disabled={loading || !channels.trim()}
