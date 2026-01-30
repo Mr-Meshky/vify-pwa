@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import crypto from "crypto";
 
-// Types
 type Result = Record<"config" | "country" | "typeConfig", string>;
 type FinalResult = Record<"protocol", string> & Result;
 
@@ -18,37 +18,206 @@ interface CategoryResult {
   errors: string[];
 }
 
-// Constants
 const DEFAULT_MESSAGE_COUNT = 5;
 const countryFlagMap: Record<string, string> = {
-  AF: "AF", AL: "AL", DZ: "DZ", AD: "AD", AO: "AO", AG: "AG", AR: "AR", AM: "AM",
-  AU: "AU", AT: "AT", AZ: "AZ", BS: "BS", BH: "BH", BD: "BD", BB: "BB", BY: "BY",
-  BE: "BE", BZ: "BZ", BJ: "BJ", BT: "BT", BO: "BO", BA: "BA", BW: "BW", BR: "BR",
-  BN: "BN", BG: "BG", BF: "BF", BI: "BI", CV: "CV", KH: "KH", CM: "CM", CA: "CA",
-  CF: "CF", TD: "TD", CL: "CL", CN: "CN", CO: "CO", KM: "KM", CG: "CG", CR: "CR",
-  HR: "HR", CU: "CU", CY: "CY", CZ: "CZ", CD: "CD", DK: "DK", DJ: "DJ", DM: "DM",
-  DO: "DO", EC: "EC", EG: "EG", SV: "SV", GQ: "GQ", ER: "ER", EE: "EE", SZ: "SZ",
-  ET: "ET", FJ: "FJ", FI: "FI", FR: "FR", GA: "GA", GM: "GM", GE: "GE", DE: "DE",
-  GH: "GH", GR: "GR", GD: "GD", GT: "GT", GN: "GN", GW: "GW", GY: "GY", HT: "HT",
-  HN: "HN", HU: "HU", IS: "IS", IN: "IN", ID: "ID", IR: "IR", IQ: "IQ", IE: "IE",
-  IL: "IL", IT: "IT", JM: "JM", JP: "JP", JO: "JO", KZ: "KZ", KE: "KE", KI: "KI",
-  KW: "KW", KG: "KG", LA: "LA", LV: "LV", LB: "LB", LS: "LS", LR: "LR", LY: "LY",
-  LI: "LI", LT: "LT", LU: "LU", MG: "MG", MW: "MW", MY: "MY", MV: "MV", ML: "ML",
-  MT: "MT", MH: "MH", MR: "MR", MU: "MU", MX: "MX", FM: "FM", MD: "MD", MC: "MC",
-  MN: "MN", ME: "ME", MA: "MA", MZ: "MZ", MM: "MM", NA: "NA", NR: "NR", NP: "NP",
-  NL: "NL", NZ: "NZ", NI: "NI", NE: "NE", NG: "NG", KP: "KP", MK: "MK", NO: "NO",
-  OM: "OM", PK: "PK", PW: "PW", PS: "PS", PA: "PA", PG: "PG", PY: "PY", PE: "PE",
-  PH: "PH", PL: "PL", PT: "PT", QA: "QA", RO: "RO", RU: "RU", RW: "RW", KN: "KN",
-  LC: "LC", VC: "VC", WS: "WS", SM: "SM", ST: "ST", SA: "SA", SN: "SN", RS: "RS",
-  SC: "SC", SL: "SL", SG: "SG", SK: "SK", SI: "SI", SB: "SB", SO: "SO", ZA: "ZA",
-  KR: "KR", SS: "SS", ES: "ES", LK: "LK", SD: "SD", SR: "SR", SE: "SE", CH: "CH",
-  SY: "SY", TW: "TW", TJ: "TJ", TZ: "TZ", TH: "TH", TL: "TL", TG: "TG", TO: "TO",
-  TT: "TT", TN: "TN", TR: "TR", TM: "TM", TV: "TV", UG: "UG", UA: "UA", AE: "AE",
-  GB: "GB", US: "US", UY: "UY", UZ: "UZ", VU: "VU", VA: "VA", VE: "VE", VN: "VN",
-  YE: "YE", ZM: "ZM", ZW: "ZW", UN: "UN"
+  AF: "AF",
+  AL: "AL",
+  DZ: "DZ",
+  AD: "AD",
+  AO: "AO",
+  AG: "AG",
+  AR: "AR",
+  AM: "AM",
+  AU: "AU",
+  AT: "AT",
+  AZ: "AZ",
+  BS: "BS",
+  BH: "BH",
+  BD: "BD",
+  BB: "BB",
+  BY: "BY",
+  BE: "BE",
+  BZ: "BZ",
+  BJ: "BJ",
+  BT: "BT",
+  BO: "BO",
+  BA: "BA",
+  BW: "BW",
+  BR: "BR",
+  BN: "BN",
+  BG: "BG",
+  BF: "BF",
+  BI: "BI",
+  CV: "CV",
+  KH: "KH",
+  CM: "CM",
+  CA: "CA",
+  CF: "CF",
+  TD: "TD",
+  CL: "CL",
+  CN: "CN",
+  CO: "CO",
+  KM: "KM",
+  CG: "CG",
+  CR: "CR",
+  HR: "HR",
+  CU: "CU",
+  CY: "CY",
+  CZ: "CZ",
+  CD: "CD",
+  DK: "DK",
+  DJ: "DJ",
+  DM: "DM",
+  DO: "DO",
+  EC: "EC",
+  EG: "EG",
+  SV: "SV",
+  GQ: "GQ",
+  ER: "ER",
+  EE: "EE",
+  SZ: "SZ",
+  ET: "ET",
+  FJ: "FJ",
+  FI: "FI",
+  FR: "FR",
+  GA: "GA",
+  GM: "GM",
+  GE: "GE",
+  DE: "DE",
+  GH: "GH",
+  GR: "GR",
+  GD: "GD",
+  GT: "GT",
+  GN: "GN",
+  GW: "GW",
+  GY: "GY",
+  HT: "HT",
+  HN: "HN",
+  HU: "HU",
+  IS: "IS",
+  IN: "IN",
+  ID: "ID",
+  IR: "IR",
+  IQ: "IQ",
+  IE: "IE",
+  IL: "IL",
+  IT: "IT",
+  JM: "JM",
+  JP: "JP",
+  JO: "JO",
+  KZ: "KZ",
+  KE: "KE",
+  KI: "KI",
+  KW: "KW",
+  KG: "KG",
+  LA: "LA",
+  LV: "LV",
+  LB: "LB",
+  LS: "LS",
+  LR: "LR",
+  LY: "LY",
+  LI: "LI",
+  LT: "LT",
+  LU: "LU",
+  MG: "MG",
+  MW: "MW",
+  MY: "MY",
+  MV: "MV",
+  ML: "ML",
+  MT: "MT",
+  MH: "MH",
+  MR: "MR",
+  MU: "MU",
+  MX: "MX",
+  FM: "FM",
+  MD: "MD",
+  MC: "MC",
+  MN: "MN",
+  ME: "ME",
+  MA: "MA",
+  MZ: "MZ",
+  MM: "MM",
+  NA: "NA",
+  NR: "NR",
+  NP: "NP",
+  NL: "NL",
+  NZ: "NZ",
+  NI: "NI",
+  NE: "NE",
+  NG: "NG",
+  KP: "KP",
+  MK: "MK",
+  NO: "NO",
+  OM: "OM",
+  PK: "PK",
+  PW: "PW",
+  PS: "PS",
+  PA: "PA",
+  PG: "PG",
+  PY: "PY",
+  PE: "PE",
+  PH: "PH",
+  PL: "PL",
+  PT: "PT",
+  QA: "QA",
+  RO: "RO",
+  RU: "RU",
+  RW: "RW",
+  KN: "KN",
+  LC: "LC",
+  VC: "VC",
+  WS: "WS",
+  SM: "SM",
+  ST: "ST",
+  SA: "SA",
+  SN: "SN",
+  RS: "RS",
+  SC: "SC",
+  SL: "SL",
+  SG: "SG",
+  SK: "SK",
+  SI: "SI",
+  SB: "SB",
+  SO: "SO",
+  ZA: "ZA",
+  KR: "KR",
+  SS: "SS",
+  ES: "ES",
+  LK: "LK",
+  SD: "SD",
+  SR: "SR",
+  SE: "SE",
+  CH: "CH",
+  SY: "SY",
+  TW: "TW",
+  TJ: "TJ",
+  TZ: "TZ",
+  TH: "TH",
+  TL: "TL",
+  TG: "TG",
+  TO: "TO",
+  TT: "TT",
+  TN: "TN",
+  TR: "TR",
+  TM: "TM",
+  TV: "TV",
+  UG: "UG",
+  UA: "UA",
+  AE: "AE",
+  GB: "GB",
+  US: "US",
+  UY: "UY",
+  UZ: "UZ",
+  VU: "VU",
+  VA: "VA",
+  VE: "VE",
+  VN: "VN",
+  YE: "YE",
+  ZM: "ZM",
+  ZW: "ZW",
+  UN: "UN",
 };
 
-// Helper functions
 function getCountryFlagEmoji(countryCode: string): string {
   if (!countryCode || countryCode.length !== 2) return "";
   const codePoints = countryCode
@@ -91,19 +260,16 @@ async function checkIP(ipaddress: string): Promise<{
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
-    
     const response = await fetch(
       `https://www.irjh.top/py/check/ip.php?ip=${ipaddress}`,
-      { signal: controller.signal }
+      { signal: controller.signal },
     );
     clearTimeout(timeoutId);
 
     if (response.ok) {
       data = (await response.json()) as IPApiResponse;
     }
-  } catch {
-    // Ignore errors, use defaults
-  }
+  } catch {}
 
   const country = data.country ?? "Unknown";
   const countryCode = data.countryCode ?? "UN";
@@ -127,13 +293,17 @@ async function vmessHandle(input: string, messageId: string): Promise<Result> {
   };
 }
 
-async function configChanger(urlString: string, channel: string, messageId: string): Promise<FinalResult | null> {
+async function configChanger(
+  urlString: string,
+  channel: string,
+  messageId: string,
+): Promise<FinalResult | null> {
   try {
     const protocol = urlString.split("://")[0];
     let config: string, country: string, typeConfig: string;
 
     if (protocol === "vmess") {
-      const vmessConf = await vmessHandle(urlString.split("://")[1], channel, messageId);
+      const vmessConf = await vmessHandle(urlString.split("://")[1], messageId);
       config = "vmess://" + vmessConf.config;
       country = vmessConf.country;
       typeConfig = vmessConf.typeConfig;
@@ -144,7 +314,12 @@ async function configChanger(urlString: string, channel: string, messageId: stri
 
       typeConfig = searchParams.get("type") ?? "";
       country = api.country;
-      config = urlString.split("#")[0] + "#" + encodeURIComponent(`${flag} @${channel} ${messageId}`);
+      config =
+        urlString.split("#")[0] +
+        "#" +
+        encodeURIComponent(
+          `${flag} @MrMeshkyChannel ${crypto.randomInt(100000, 999999)}`,
+        );
     }
 
     return { protocol, config, country, typeConfig };
@@ -156,7 +331,7 @@ async function configChanger(urlString: string, channel: string, messageId: stri
 async function fetchChannelConfigs(
   channel: string,
   result: CategoryResult,
-  messageCount: number = DEFAULT_MESSAGE_COUNT
+  messageCount: number = DEFAULT_MESSAGE_COUNT,
 ): Promise<void> {
   const url = `https://t.me/s/${channel}`;
 
@@ -180,16 +355,13 @@ async function fetchChannelConfigs(
     }
 
     const html = await response.text();
-    
-    // Extract message IDs from the HTML
     const messageIdRegex = /data-post="[^/]+\/(\d+)"/g;
     const messageIds: string[] = [];
     let idMatch;
     while ((idMatch = messageIdRegex.exec(html)) !== null) {
       messageIds.push(idMatch[1]);
     }
-    
-    // Extract configs with their surrounding context to match with message IDs
+
     const configRegex = /(vless|vmess|wireguard|trojan|ss):\/\/[^\s<>]+/gm;
     const matches = html.match(configRegex);
 
@@ -199,9 +371,10 @@ async function fetchChannelConfigs(
     }
 
     const lastConfigs = matches.slice(-messageCount);
-    // Use last message IDs corresponding to configs
-    const lastMessageIds = messageIds.slice(-Math.max(messageIds.length, lastConfigs.length));
-    
+    const lastMessageIds = messageIds.slice(
+      -Math.max(messageIds.length, lastConfigs.length),
+    );
+
     let configIndex = 0;
     for (const element of lastConfigs) {
       const decodeHtml = decodeHtmlEntities(element);
@@ -211,26 +384,24 @@ async function fetchChannelConfigs(
         continue;
       }
 
-      // Get corresponding message ID or use a counter
-      const messageId = lastMessageIds[Math.min(configIndex, lastMessageIds.length - 1)] || String(configIndex + 1);
-      
+      const messageId =
+        lastMessageIds[Math.min(configIndex, lastMessageIds.length - 1)] ||
+        String(configIndex + 1);
+
       const finalResult = await configChanger(decodeHtml, channel, messageId);
       configIndex++;
 
       if (finalResult) {
-        // Add to protocol category
         if (!result.protocol[finalResult.protocol]) {
           result.protocol[finalResult.protocol] = [];
         }
         result.protocol[finalResult.protocol].push(finalResult.config);
 
-        // Add to country category
         if (!result.country[finalResult.country]) {
           result.country[finalResult.country] = [];
         }
         result.country[finalResult.country].push(finalResult.config);
 
-        // Add to type category
         if (finalResult.typeConfig) {
           if (!result.type[finalResult.typeConfig]) {
             result.type[finalResult.typeConfig] = [];
@@ -238,7 +409,6 @@ async function fetchChannelConfigs(
           result.type[finalResult.typeConfig].push(finalResult.config);
         }
 
-        // Add to all
         result.all.push(finalResult.config);
       }
     }
@@ -253,20 +423,20 @@ export async function POST(request: NextRequest) {
     const channels: string[] = body.channels;
     const messageCount: number = Math.min(
       50,
-      Math.max(1, body.messageCount || DEFAULT_MESSAGE_COUNT)
+      Math.max(1, body.messageCount || DEFAULT_MESSAGE_COUNT),
     );
 
     if (!channels || !Array.isArray(channels) || channels.length === 0) {
       return NextResponse.json(
         { error: "channels array is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (channels.length > 20) {
       return NextResponse.json(
         { error: "Maximum 20 channels allowed per request" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -278,10 +448,8 @@ export async function POST(request: NextRequest) {
       errors: [],
     };
 
-    // Process channels sequentially to avoid rate limiting
     for (const channel of channels) {
       await fetchChannelConfigs(channel.trim(), result, messageCount);
-      // Small delay between channels to avoid rate limiting
       await new Promise((resolve) => setTimeout(resolve, 500));
     }
 
@@ -299,7 +467,7 @@ export async function POST(request: NextRequest) {
   } catch {
     return NextResponse.json(
       { error: "Failed to process request" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -17,6 +17,7 @@ import {
   Layers,
   AlertCircle,
   ExternalLink,
+  MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -42,6 +43,7 @@ interface ScanResult {
 
 export default function ScannerPage() {
   const [channels, setChannels] = useState("");
+  const [messageCount, setMessageCount] = useState(5);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ScanResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -75,7 +77,7 @@ export default function ScannerPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ channels: channelList }),
+        body: JSON.stringify({ channels: channelList, messageCount }),
       });
 
       const data = await response.json();
@@ -101,7 +103,7 @@ export default function ScannerPage() {
   const renderConfigList = (
     configs: Record<string, string[]>,
     icon: React.ReactNode,
-    title: string
+    title: string,
   ) => {
     const entries = Object.entries(configs);
     if (entries.length === 0) {
@@ -142,7 +144,8 @@ export default function ScannerPage() {
               <div className="max-h-32 overflow-y-auto rounded-lg bg-secondary/50 p-2">
                 <pre className="text-xs text-muted-foreground" dir="ltr">
                   {configList.slice(0, 5).join("\n")}
-                  {configList.length > 5 && `\n... و ${configList.length - 5} مورد دیگر`}
+                  {configList.length > 5 &&
+                    `\n... و ${configList.length - 5} مورد دیگر`}
                 </pre>
               </div>
             </CardContent>
@@ -205,12 +208,40 @@ export default function ScannerPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <Textarea
-              placeholder={`نام کانال‌ها را وارد کنید (هر خط یک کانال)\nمثال:\nMrMeshkyChannel\nv2rayng\nv2ray_meshky`}
+              placeholder={`نام کانال‌ها را وارد کنید (هر خط یک کانال)\nمثال:\nv2rayng_fast\nv2ray_free_conf`}
               value={channels}
               onChange={(e) => setChannels(e.target.value)}
               className="min-h-32 font-mono text-sm"
               dir="ltr"
             />
+
+            {/* Message Count Input */}
+            <div className="flex items-center gap-3 rounded-lg bg-secondary/50 p-3">
+              <MessageSquare className="h-5 w-5 text-muted-foreground" />
+              <div className="flex-1">
+                <label className="mb-1 block text-sm font-medium text-foreground">
+                  تعداد پیام آخر
+                </label>
+                <p className="text-xs text-muted-foreground">
+                  چند پیام آخر هر کانال بررسی شود؟
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                {[2, 5, 10, 20, 30].map((num) => (
+                  <button
+                    key={num}
+                    onClick={() => setMessageCount(num)}
+                    className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                      messageCount === num
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                    }`}
+                  >
+                    {num}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <Button
               onClick={handleScan}
@@ -325,21 +356,21 @@ export default function ScannerPage() {
                 {renderConfigList(
                   result.data.protocol,
                   <Server className="h-4 w-4 text-primary" />,
-                  "پروتکل"
+                  "پروتکل",
                 )}
               </TabsContent>
               <TabsContent value="country">
                 {renderConfigList(
                   result.data.country,
                   <Globe className="h-4 w-4 text-primary" />,
-                  "کشور"
+                  "کشور",
                 )}
               </TabsContent>
               <TabsContent value="type">
                 {renderConfigList(
                   result.data.type,
                   <Layers className="h-4 w-4 text-primary" />,
-                  "نوع"
+                  "نوع",
                 )}
               </TabsContent>
             </Tabs>
