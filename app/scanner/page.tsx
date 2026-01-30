@@ -208,7 +208,7 @@ export default function ScannerPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <Textarea
-              placeholder={`نام کانال‌ها را وارد کنید (هر خط یک کانال)\nمثال:\nv2rayng_fast\nv2ray_free_conf`}
+              placeholder={`نام کانال‌ها را وارد کنید (هر خط یک کانال)\nمثال:\nMrMeshkyChannel\nv2rayng`}
               value={channels}
               onChange={(e) => setChannels(e.target.value)}
               className="min-h-32 font-mono text-sm"
