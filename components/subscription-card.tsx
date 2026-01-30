@@ -49,6 +49,8 @@ export function SubscriptionCard({
   const [expanded, setExpanded] = useState(false);
   const [showQR, setShowQR] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [rangeStart, setRangeStart] = useState(0);
+  const [rangeEnd, setRangeEnd] = useState(150);
 
   const copyUrl = async () => {
     await navigator.clipboard.writeText(url);
@@ -87,9 +89,26 @@ export function SubscriptionCard({
     }
   };
 
+  const getSelectedConfigs = () => {
+    if (!content) return "";
+    const lines = content.split("\n").filter((line) => line.trim().length > 0);
+    const maxEnd = Math.min(rangeEnd, lines.length);
+    const start = Math.min(rangeStart, maxEnd);
+    return lines.slice(start, maxEnd).join("\n");
+  };
+
+  const getSelectedCount = () => {
+    if (!content) return 0;
+    const lines = content.split("\n").filter((line) => line.trim().length > 0);
+    const maxEnd = Math.min(rangeEnd, lines.length);
+    const start = Math.min(rangeStart, maxEnd);
+    return maxEnd - start;
+  };
+
   const copyContent = async () => {
     if (content) {
-      await navigator.clipboard.writeText(content);
+      const selectedContent = getSelectedConfigs();
+      await navigator.clipboard.writeText(selectedContent);
       setContentCopied(true);
       navigator.vibrate?.(50);
       setTimeout(() => setContentCopied(false), 2000);
@@ -178,6 +197,85 @@ export function SubscriptionCard({
         {/* Expanded Content */}
         {expanded && content && (
           <div className="border-t border-border/50 bg-secondary/20 p-4">
+            {/* Range Selector */}
+            <div className="mb-4 rounded-xl bg-background/50 p-3">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-xs font-medium text-foreground">
+                  انتخاب محدوده
+                </span>
+                <span className="rounded-lg bg-primary/10 px-2 py-1 font-mono text-xs text-primary">
+                  {getSelectedCount()} از {configCount}
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <div className="flex flex-1 items-center gap-2">
+                  <input
+                    type="number"
+                    value={rangeStart}
+                    onChange={(e) => setRangeStart(Math.max(0, parseInt(e.target.value) || 0))}
+                    className="w-16 rounded-lg border border-border bg-background px-2 py-1.5 text-center font-mono text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                    min={0}
+                    max={configCount || 0}
+                  />
+                  <div className="flex-1">
+                    <input
+                      type="range"
+                      value={rangeStart}
+                      onChange={(e) => setRangeStart(parseInt(e.target.value))}
+                      className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-border accent-primary"
+                      min={0}
+                      max={configCount || 150}
+                    />
+                  </div>
+                </div>
+                
+                <span className="text-muted-foreground">-</span>
+                
+                <div className="flex flex-1 items-center gap-2">
+                  <div className="flex-1">
+                    <input
+                      type="range"
+                      value={rangeEnd}
+                      onChange={(e) => setRangeEnd(parseInt(e.target.value))}
+                      className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-border accent-primary"
+                      min={0}
+                      max={configCount || 150}
+                    />
+                  </div>
+                  <input
+                    type="number"
+                    value={rangeEnd}
+                    onChange={(e) => setRangeEnd(Math.min(configCount || 150, parseInt(e.target.value) || 0))}
+                    className="w-16 rounded-lg border border-border bg-background px-2 py-1.5 text-center font-mono text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                    min={0}
+                    max={configCount || 150}
+                  />
+                </div>
+              </div>
+              
+              {/* Quick Select Buttons */}
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {[
+                  { label: "همه", start: 0, end: configCount || 150 },
+                  { label: "50 اول", start: 0, end: 50 },
+                  { label: "100 اول", start: 0, end: 100 },
+                  { label: "150 اول", start: 0, end: 150 },
+                ].map((preset) => (
+                  <button
+                    key={preset.label}
+                    onClick={() => {
+                      setRangeStart(preset.start);
+                      setRangeEnd(Math.min(preset.end, configCount || preset.end));
+                    }}
+                    className="rounded-lg bg-secondary px-2.5 py-1 text-xs text-secondary-foreground transition-colors hover:bg-secondary/80 active:scale-95"
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="mb-3 flex items-center justify-between">
               <span className="text-xs text-muted-foreground">
                 {configCount} کانفیگ
@@ -196,7 +294,7 @@ export function SubscriptionCard({
                 ) : (
                   <>
                     <Copy className="ml-1 h-3 w-3" />
-                    کپی همه
+                    کپی {getSelectedCount()} کانفیگ
                   </>
                 )}
               </Button>
@@ -206,8 +304,8 @@ export function SubscriptionCard({
                 className="whitespace-pre-wrap break-all font-mono text-xs text-muted-foreground"
                 dir="ltr"
               >
-                {content.slice(0, 800)}
-                {content.length > 800 ? "\n..." : ""}
+                {getSelectedConfigs().slice(0, 800)}
+                {getSelectedConfigs().length > 800 ? "\n..." : ""}
               </pre>
             </div>
           </div>
