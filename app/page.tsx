@@ -56,7 +56,7 @@ export default function Home() {
                 <Shield className="h-8 w-8 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">VIfy</h1>
+                <h1 className="text-2xl font-bold text-foreground">Vify</h1>
                 <p className="text-sm text-muted-foreground">
                   مجموعه کانفیگ‌های رایگان V2Ray
                 </p>

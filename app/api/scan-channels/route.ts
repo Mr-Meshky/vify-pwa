@@ -49,6 +49,15 @@ const countryFlagMap: Record<string, string> = {
 };
 
 // Helper functions
+function getCountryFlagEmoji(countryCode: string): string {
+  if (!countryCode || countryCode.length !== 2) return "";
+  const codePoints = countryCode
+    .toUpperCase()
+    .split("")
+    .map((char) => 127397 + char.charCodeAt(0));
+  return String.fromCodePoint(...codePoints);
+}
+
 function decodeHtmlEntities(str: string): string {
   return decodeURIComponent(str)
     .replace(/&amp;/g, "&")
@@ -104,11 +113,12 @@ async function checkIP(ipaddress: string): Promise<{
   return { country, flag, ip, countryCode };
 }
 
-async function vmessHandle(input: string): Promise<Result> {
+async function vmessHandle(input: string, channel: string, messageId: string): Promise<Result> {
   const configinfo = decodeBase64Unicode(input) as Record<string, string>;
 
-  const { countryCode, country, ip } = await checkIP(configinfo.add);
-  configinfo.ps = `${countryCode} | ${ip}`;
+  const { countryCode, country } = await checkIP(configinfo.add);
+  const flag = getCountryFlagEmoji(countryCode);
+  configinfo.ps = `${flag} @${channel} ${messageId}`;
 
   return {
     config: encodeBase64Unicode(configinfo),
@@ -117,23 +127,24 @@ async function vmessHandle(input: string): Promise<Result> {
   };
 }
 
-async function configChanger(urlString: string): Promise<FinalResult | null> {
+async function configChanger(urlString: string, channel: string, messageId: string): Promise<FinalResult | null> {
   try {
     const protocol = urlString.split("://")[0];
     let config: string, country: string, typeConfig: string;
 
     if (protocol === "vmess") {
-      const vmessConf = await vmessHandle(urlString.split("://")[1]);
+      const vmessConf = await vmessHandle(urlString.split("://")[1], channel, messageId);
       config = "vmess://" + vmessConf.config;
       country = vmessConf.country;
       typeConfig = vmessConf.typeConfig;
     } else {
       const { hostname, searchParams } = new URL(urlString);
       const api = await checkIP(hostname);
+      const flag = getCountryFlagEmoji(api.countryCode);
 
       typeConfig = searchParams.get("type") ?? "";
       country = api.country;
-      config = urlString.split("#")[0] + "#" + `${api.countryCode} | ${api.ip}`;
+      config = urlString.split("#")[0] + "#" + encodeURIComponent(`${flag} @${channel} ${messageId}`);
     }
 
     return { protocol, config, country, typeConfig };
@@ -169,8 +180,18 @@ async function fetchChannelConfigs(
     }
 
     const html = await response.text();
-    const regex = /(vless|vmess|wireguard|trojan|ss):\/\/[^\s<>]+/gm;
-    const matches = html.match(regex);
+    
+    // Extract message IDs from the HTML
+    const messageIdRegex = /data-post="[^/]+\/(\d+)"/g;
+    const messageIds: string[] = [];
+    let idMatch;
+    while ((idMatch = messageIdRegex.exec(html)) !== null) {
+      messageIds.push(idMatch[1]);
+    }
+    
+    // Extract configs with their surrounding context to match with message IDs
+    const configRegex = /(vless|vmess|wireguard|trojan|ss):\/\/[^\s<>]+/gm;
+    const matches = html.match(configRegex);
 
     if (!matches) {
       result.errors.push(channel);
@@ -178,15 +199,23 @@ async function fetchChannelConfigs(
     }
 
     const lastConfigs = matches.slice(-messageCount);
-
+    // Use last message IDs corresponding to configs
+    const lastMessageIds = messageIds.slice(-Math.max(messageIds.length, lastConfigs.length));
+    
+    let configIndex = 0;
     for (const element of lastConfigs) {
       const decodeHtml = decodeHtmlEntities(element);
 
       if (decodeHtml.includes("…")) {
+        configIndex++;
         continue;
       }
 
-      const finalResult = await configChanger(decodeHtml);
+      // Get corresponding message ID or use a counter
+      const messageId = lastMessageIds[Math.min(configIndex, lastMessageIds.length - 1)] || String(configIndex + 1);
+      
+      const finalResult = await configChanger(decodeHtml, channel, messageId);
+      configIndex++;
 
       if (finalResult) {
         // Add to protocol category
