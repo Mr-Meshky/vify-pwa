@@ -1,7 +1,9 @@
 import { SubscriptionCard } from "@/components/subscription-card";
 import { AboutSection } from "@/components/about-section";
-import { Shield } from "lucide-react";
+import { Shield, Scan } from "lucide-react";
 import { LastCommitTime } from "@/components/last-commit-time";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const subscriptions = [
   {
@@ -48,16 +50,24 @@ export default function Home() {
       <div className="mx-auto max-w-2xl px-4 py-6">
         {/* Header */}
         <header className="mb-8">
-          <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 shadow-lg shadow-primary/10">
-              <Shield className="h-8 w-8 text-primary" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 shadow-lg shadow-primary/10">
+                <Shield className="h-8 w-8 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">VIfy</h1>
+                <p className="text-sm text-muted-foreground">
+                  مجموعه کانفیگ‌های رایگان V2Ray
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">VIfy</h1>
-              <p className="text-sm text-muted-foreground">
-                مجموعه کانفیگ‌های رایگان V2Ray
-              </p>
-            </div>
+            <Link href="/scanner">
+              <Button variant="outline" size="sm" className="gap-2">
+                <Scan className="h-4 w-4" />
+                اسکنر
+              </Button>
+            </Link>
           </div>
         </header>
 
