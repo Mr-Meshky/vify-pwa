@@ -103,7 +103,7 @@ export default function ScannerPage() {
   const renderConfigList = (
     configs: Record<string, string[]>,
     icon: React.ReactNode,
-    title: string,
+    title: string
   ) => {
     const entries = Object.entries(configs);
     if (entries.length === 0) {
@@ -216,7 +216,7 @@ export default function ScannerPage() {
             />
 
             {/* Message Count Input */}
-            <div className="flex items-center gap-3 rounded-lg bg-secondary/50 p-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 rounded-lg bg-secondary/50 p-3">
               <MessageSquare className="h-5 w-5 text-muted-foreground" />
               <div className="flex-1">
                 <label className="mb-1 block text-sm font-medium text-foreground">
@@ -356,21 +356,21 @@ export default function ScannerPage() {
                 {renderConfigList(
                   result.data.protocol,
                   <Server className="h-4 w-4 text-primary" />,
-                  "پروتکل",
+                  "پروتکل"
                 )}
               </TabsContent>
               <TabsContent value="country">
                 {renderConfigList(
                   result.data.country,
                   <Globe className="h-4 w-4 text-primary" />,
-                  "کشور",
+                  "کشور"
                 )}
               </TabsContent>
               <TabsContent value="type">
                 {renderConfigList(
                   result.data.type,
                   <Layers className="h-4 w-4 text-primary" />,
-                  "نوع",
+                  "نوع"
                 )}
               </TabsContent>
             </Tabs>
