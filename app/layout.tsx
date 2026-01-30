@@ -1,6 +1,7 @@
-import type { Metadata, Viewport } from "next";
 import { Vazirmatn } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import Script from "next/script";
+import { Metadata, Viewport } from "next";
 import "./globals.css";
 
 const vazirmatn = Vazirmatn({
@@ -48,6 +49,25 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="fa" dir="rtl">
       <body className={`${vazirmatn.variable} font-sans antialiased`}>
         {children}
+        
+
+        <Script
+          strategy="afterInteractive"
+          src={`https://www.googletagmanager.com/gtag/js?id=G-PYQYFWNLMP`}
+        />
+        <Script
+          id="google-analytics"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-PYQYFWNLMP'); 
+            `,
+          }}
+        />
+        
         <Analytics />
       </body>
     </html>
