@@ -113,12 +113,12 @@ async function checkIP(ipaddress: string): Promise<{
   return { country, flag, ip, countryCode };
 }
 
-async function vmessHandle(input: string, channel: string, messageId: string): Promise<Result> {
+async function vmessHandle(input: string, messageId: string): Promise<Result> {
   const configinfo = decodeBase64Unicode(input) as Record<string, string>;
 
   const { countryCode, country } = await checkIP(configinfo.add);
   const flag = getCountryFlagEmoji(countryCode);
-  configinfo.ps = `${flag} @${channel} ${messageId}`;
+  configinfo.ps = `${flag} @MrMeshkyChannel ${messageId}`;
 
   return {
     config: encodeBase64Unicode(configinfo),
