@@ -218,6 +218,10 @@ const countryFlagMap: Record<string, string> = {
   UN: "UN",
 };
 
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN;
+const REQUIRED_CLIENT_HEADER = "x-vify-client";
+const REQUIRED_CLIENT_VALUE = "web";
+
 function getCountryFlagEmoji(countryCode: string): string {
   if (!countryCode || countryCode.length !== 2) return "";
   const codePoints = countryCode
@@ -417,8 +421,47 @@ async function fetchChannelConfigs(
   }
 }
 
+function withCORS(res: NextResponse, origin: string | null) {
+  if (origin === ALLOWED_ORIGIN) {
+    res.headers.set("Access-Control-Allow-Origin", origin);
+    res.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.headers.set(
+      "Access-Control-Allow-Headers",
+      "Content-Type, x-vify-client"
+    );
+  }
+  return res;
+}
+
+export async function OPTIONS(request: NextRequest) {
+  const origin = request.headers.get("origin");
+
+  if (origin !== ALLOWED_ORIGIN) {
+    return new NextResponse(null, { status: 403 });
+  }
+
+  return withCORS(new NextResponse(null, { status: 204 }), origin);
+}
+
 export async function POST(request: NextRequest) {
   try {
+    const origin = request.headers.get("origin");
+    const client = request.headers.get(REQUIRED_CLIENT_HEADER);
+
+    // 🔐 Origin check
+    console.log(origin, ALLOWED_ORIGIN);
+    if (origin !== ALLOWED_ORIGIN) {
+      return NextResponse.json({ error: "Forbidden origin" }, { status: 403 });
+    }
+
+    // 🔐 Client header check
+    if (client !== REQUIRED_CLIENT_VALUE) {
+      return NextResponse.json(
+        { error: "Unauthorized client" },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const channels: string[] = body.channels;
     const messageCount: number = Math.min(
@@ -427,16 +470,22 @@ export async function POST(request: NextRequest) {
     );
 
     if (!channels || !Array.isArray(channels) || channels.length === 0) {
-      return NextResponse.json(
-        { error: "channels array is required" },
-        { status: 400 }
+      return withCORS(
+        NextResponse.json(
+          { error: "channels array is required" },
+          { status: 400 }
+        ),
+        origin
       );
     }
 
     if (channels.length > 20) {
-      return NextResponse.json(
-        { error: "Maximum 20 channels allowed per request" },
-        { status: 400 }
+      return withCORS(
+        NextResponse.json(
+          { error: "Maximum 20 channels allowed per request" },
+          { status: 400 }
+        ),
+        origin
       );
     }
 
@@ -453,17 +502,20 @@ export async function POST(request: NextRequest) {
       await new Promise((resolve) => setTimeout(resolve, 500));
     }
 
-    return NextResponse.json({
-      success: true,
-      data: result,
-      stats: {
-        totalConfigs: result.all.length,
-        protocols: Object.keys(result.protocol).length,
-        countries: Object.keys(result.country).length,
-        types: Object.keys(result.type).length,
-        errors: result.errors.length,
-      },
-    });
+    return withCORS(
+      NextResponse.json({
+        success: true,
+        data: result,
+        stats: {
+          totalConfigs: result.all.length,
+          protocols: Object.keys(result.protocol).length,
+          countries: Object.keys(result.country).length,
+          types: Object.keys(result.type).length,
+          errors: result.errors.length,
+        },
+      }),
+      origin
+    );
   } catch {
     return NextResponse.json(
       { error: "Failed to process request" },

@@ -14,7 +14,12 @@ interface Commit {
   };
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const fetcher = (url: string) =>
+  fetch(url, {
+    headers: {
+      "Cache-Control": "public, max-age=3600",
+    },
+  }).then((res) => res.json());
 
 function formatPersianDate(dateString: string): string {
   const date = new Date(dateString);
@@ -36,7 +41,9 @@ function formatPersianDate(dateString: string): string {
 export function LastCommitTime() {
   const { data, error, isLoading } = useSWR<Commit[]>(GITHUB_API_URL, fetcher, {
     revalidateOnFocus: false,
-    dedupingInterval: 60000, // 1 minute
+    revalidateOnReconnect: false,
+    refreshInterval: 0,
+    dedupingInterval: 60 * 60 * 1000,
   });
 
   if (isLoading) {
@@ -48,9 +55,7 @@ export function LastCommitTime() {
     );
   }
 
-  if (error || !data || !data[0]) {
-    return null;
-  }
+  if (error || !data?.[0]) return null;
 
   const lastCommitDate = data[0].commit.committer.date;
   const formattedDate = formatPersianDate(lastCommitDate);

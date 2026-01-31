@@ -76,6 +76,7 @@ export default function ScannerPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "x-vify-client": "web",
         },
         body: JSON.stringify({ channels: channelList, messageCount }),
       });
