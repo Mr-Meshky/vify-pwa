@@ -262,7 +262,7 @@ async function checkIP(ipaddress: string): Promise<{
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     const response = await fetch(
       `https://www.irjh.top/py/check/ip.php?ip=${ipaddress}`,
-      { signal: controller.signal },
+      { signal: controller.signal }
     );
     clearTimeout(timeoutId);
 
@@ -295,8 +295,8 @@ async function vmessHandle(input: string, messageId: string): Promise<Result> {
 
 async function configChanger(
   urlString: string,
-  channel: string,
-  messageId: string,
+
+  messageId: string
 ): Promise<FinalResult | null> {
   try {
     const protocol = urlString.split("://")[0];
@@ -318,7 +318,7 @@ async function configChanger(
         urlString.split("#")[0] +
         "#" +
         encodeURIComponent(
-          `${flag} @MrMeshkyChannel ${crypto.randomInt(100000, 999999)}`,
+          `${flag} @MrMeshkyChannel ${crypto.randomInt(100000, 999999)}`
         );
     }
 
@@ -331,7 +331,7 @@ async function configChanger(
 async function fetchChannelConfigs(
   channel: string,
   result: CategoryResult,
-  messageCount: number = DEFAULT_MESSAGE_COUNT,
+  messageCount: number = DEFAULT_MESSAGE_COUNT
 ): Promise<void> {
   const url = `https://t.me/s/${channel}`;
 
@@ -372,7 +372,7 @@ async function fetchChannelConfigs(
 
     const lastConfigs = matches.slice(-messageCount);
     const lastMessageIds = messageIds.slice(
-      -Math.max(messageIds.length, lastConfigs.length),
+      -Math.max(messageIds.length, lastConfigs.length)
     );
 
     let configIndex = 0;
@@ -388,7 +388,7 @@ async function fetchChannelConfigs(
         lastMessageIds[Math.min(configIndex, lastMessageIds.length - 1)] ||
         String(configIndex + 1);
 
-      const finalResult = await configChanger(decodeHtml, channel, messageId);
+      const finalResult = await configChanger(decodeHtml, messageId);
       configIndex++;
 
       if (finalResult) {
@@ -423,20 +423,20 @@ export async function POST(request: NextRequest) {
     const channels: string[] = body.channels;
     const messageCount: number = Math.min(
       50,
-      Math.max(1, body.messageCount || DEFAULT_MESSAGE_COUNT),
+      Math.max(1, body.messageCount || DEFAULT_MESSAGE_COUNT)
     );
 
     if (!channels || !Array.isArray(channels) || channels.length === 0) {
       return NextResponse.json(
         { error: "channels array is required" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     if (channels.length > 20) {
       return NextResponse.json(
         { error: "Maximum 20 channels allowed per request" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -467,7 +467,7 @@ export async function POST(request: NextRequest) {
   } catch {
     return NextResponse.json(
       { error: "Failed to process request" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
