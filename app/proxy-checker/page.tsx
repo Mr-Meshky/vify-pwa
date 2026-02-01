@@ -1,0 +1,549 @@
+"use client";
+
+import { useState, useRef, useCallback } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  Shield,
+  Loader2,
+  Copy,
+  Check,
+  ArrowRight,
+  AlertCircle,
+  Play,
+  Square,
+  RefreshCw,
+  Wifi,
+  WifiOff,
+  Clock,
+  Download,
+  Trash2,
+} from "lucide-react";
+import Link from "next/link";
+
+interface ProxyData {
+  server: string;
+  port: number;
+  secret: string;
+  original: string;
+}
+
+interface CheckedProxy extends ProxyData {
+  status: "pending" | "checking" | "success" | "failed";
+  ping?: number;
+  error?: string;
+}
+
+const PROXY_SOURCES = [
+  {
+    name: "Telegram Proxy No.1",
+    url: "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/TELEGRAM_PROXY_SUB/refs/heads/main/telegram_proxy_no1.txt",
+  },
+  {
+    name: "Telegram Proxy No.2",
+    url: "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/TELEGRAM_PROXY_SUB/refs/heads/main/telegram_proxy_no2.txt",
+  },
+];
+
+export default function ProxyCheckerPage() {
+  const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [proxies, setProxies] = useState<CheckedProxy[]>([]);
+  const [workingProxies, setWorkingProxies] = useState<CheckedProxy[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [statusText, setStatusText] = useState("آماده برای شروع...");
+  const [logs, setLogs] = useState<{ time: string; message: string; isError?: boolean }[]>([
+    { time: new Date().toLocaleTimeString("fa-IR"), message: "سیستم آماده است." },
+  ]);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  const addLog = useCallback((message: string, isError = false) => {
+    setLogs((prev) => [
+      ...prev,
+      { time: new Date().toLocaleTimeString("fa-IR"), message, isError },
+    ]);
+  }, []);
+
+  const parseProxyLink = (link: string): ProxyData | null => {
+    try {
+      let cleanLink = link.trim().replace(".&", "&");
+      if (!cleanLink.includes("://")) return null;
+
+      const urlObj = new URL(cleanLink);
+      const params = new URLSearchParams(urlObj.search);
+
+      const server = params.get("server");
+      const port = parseInt(params.get("port") || "0");
+      const secret = params.get("secret");
+
+      if (!server || !port || !secret || isNaN(port)) return null;
+      if (port <= 0 || port > 65535) return null;
+
+      // Skip fake/bad secrets
+      if (secret.length > 170 || secret.includes("AAAAAAAAAAAAAAAAAAAA")) {
+        return null;
+      }
+
+      return { server, port, secret, original: cleanLink };
+    } catch {
+      return null;
+    }
+  };
+
+  const fetchProxies = async () => {
+    setLoading(true);
+    setError(null);
+    setProxies([]);
+    setWorkingProxies([]);
+    setProgress(0);
+    addLog("در حال دریافت لیست پروکسی‌ها...");
+
+    try {
+      const allLinks: string[] = [];
+
+      for (const source of PROXY_SOURCES) {
+        addLog(`دریافت از ${source.name}...`);
+        const response = await fetch(
+          `/api/fetch-subscription?url=${encodeURIComponent(source.url)}`
+        );
+        if (!response.ok) {
+          addLog(`خطا در دریافت از ${source.name}`, true);
+          continue;
+        }
+        const text = await response.text();
+        const lines = text.split("\n").filter((l) => l.trim());
+        allLinks.push(...lines);
+        addLog(`${lines.length} لینک از ${source.name} دریافت شد.`);
+      }
+
+      // Parse and deduplicate
+      const uniqueServers = new Set<string>();
+      const parsedProxies: CheckedProxy[] = [];
+
+      for (const link of allLinks) {
+        const parsed = parseProxyLink(link);
+        if (parsed) {
+          const key = `${parsed.server}:${parsed.port}`;
+          if (!uniqueServers.has(key)) {
+            uniqueServers.add(key);
+            parsedProxies.push({ ...parsed, status: "pending" });
+          }
+        }
+      }
+
+      if (parsedProxies.length === 0) {
+        setError("هیچ لینک معتبری یافت نشد!");
+        addLog("هیچ لینک معتبری پیدا نشد.", true);
+        return;
+      }
+
+      setProxies(parsedProxies);
+      addLog(`${parsedProxies.length} پروکسی معتبر آماده بررسی است.`);
+      setStatusText(`${parsedProxies.length} پروکسی آماده بررسی`);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "خطای نامشخص";
+      setError(errorMessage);
+      addLog(`خطا: ${errorMessage}`, true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const checkProxy = async (proxy: ProxyData): Promise<{ ok: boolean; ping?: number }> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+    try {
+      const response = await fetch("/api/check-proxy", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(proxy),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        return { ok: false };
+      }
+
+      const result = await response.json();
+      return result;
+    } catch {
+      clearTimeout(timeoutId);
+      return { ok: false };
+    }
+  };
+
+  const startChecking = async () => {
+    if (proxies.length === 0) {
+      setError("ابتدا لیست پروکسی‌ها را دریافت کنید");
+      return;
+    }
+
+    setChecking(true);
+    setWorkingProxies([]);
+    setProgress(0);
+    abortControllerRef.current = new AbortController();
+    addLog("شروع بررسی پروکسی‌ها...");
+
+    const batchSize = 5;
+    let completed = 0;
+    const total = proxies.length;
+    const working: CheckedProxy[] = [];
+
+    // Reset all to pending
+    setProxies((prev) => prev.map((p) => ({ ...p, status: "pending" })));
+
+    for (let i = 0; i < proxies.length; i += batchSize) {
+      if (abortControllerRef.current?.signal.aborted) {
+        addLog("بررسی متوقف شد.", true);
+        break;
+      }
+
+      const batch = proxies.slice(i, i + batchSize);
+
+      // Mark batch as checking
+      setProxies((prev) =>
+        prev.map((p, idx) =>
+          idx >= i && idx < i + batchSize ? { ...p, status: "checking" } : p
+        )
+      );
+
+      const results = await Promise.all(
+        batch.map(async (proxy, batchIdx) => {
+          const result = await checkProxy(proxy);
+          const idx = i + batchIdx;
+
+          if (result.ok) {
+            const checkedProxy: CheckedProxy = {
+              ...proxy,
+              status: "success",
+              ping: result.ping,
+            };
+            working.push(checkedProxy);
+            addLog(`موفق: ${proxy.server}:${proxy.port} (${result.ping}ms)`);
+            return { idx, proxy: checkedProxy };
+          } else {
+            return {
+              idx,
+              proxy: { ...proxy, status: "failed" as const, error: "اتصال ناموفق" },
+            };
+          }
+        })
+      );
+
+      // Update proxies with results
+      setProxies((prev) => {
+        const newProxies = [...prev];
+        for (const { idx, proxy } of results) {
+          newProxies[idx] = proxy;
+        }
+        return newProxies;
+      });
+
+      completed += batch.length;
+      const progressPercent = Math.round((completed / total) * 100);
+      setProgress(progressPercent);
+      setStatusText(`${completed} / ${total} | سالم: ${working.length}`);
+      setWorkingProxies([...working].sort((a, b) => (a.ping || 9999) - (b.ping || 9999)));
+    }
+
+    setChecking(false);
+    if (working.length > 0) {
+      addLog(`بررسی تمام شد. ${working.length} پروکسی سالم پیدا شد.`);
+    } else {
+      addLog("هیچ پروکسی سالمی پیدا نشد.", true);
+    }
+  };
+
+  const stopChecking = () => {
+    abortControllerRef.current?.abort();
+    setChecking(false);
+    addLog("توقف بررسی...", true);
+  };
+
+  const copyWorkingProxies = async () => {
+    if (workingProxies.length === 0) return;
+
+    const text = workingProxies
+      .map((p) => `${p.original} # Ping: ${p.ping}ms`)
+      .join("\n\n");
+
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const clearAll = () => {
+    setProxies([]);
+    setWorkingProxies([]);
+    setProgress(0);
+    setStatusText("آماده برای شروع...");
+    setLogs([{ time: new Date().toLocaleTimeString("fa-IR"), message: "سیستم پاک شد." }]);
+  };
+
+  return (
+    <main className="min-h-screen bg-background pb-safe">
+      <div className="mx-auto max-w-2xl px-4 py-6">
+        {/* Header */}
+        <header className="mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 shadow-lg shadow-primary/10">
+                <Wifi className="h-8 w-8 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">
+                  تست پروکسی تلگرام
+                </h1>
+                <p className="text-sm text-muted-foreground">
+                  بررسی اتصال MTProto
+                </p>
+              </div>
+            </div>
+            <Link href="/">
+              <Button variant="ghost" size="sm">
+                <ArrowRight className="ml-2 h-4 w-4" />
+                بازگشت
+              </Button>
+            </Link>
+          </div>
+        </header>
+
+        {/* Progress Section */}
+        <Card className="mb-6">
+          <CardContent className="py-4">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-sm font-medium text-foreground">پیشرفت</span>
+              <span className="text-sm text-muted-foreground">{progress}%</span>
+            </div>
+            <Progress value={progress} className="h-2" />
+            <p className="mt-2 text-center text-xs text-muted-foreground" dir="ltr">
+              {statusText}
+            </p>
+          </CardContent>
+        </Card>
+
+        {/* Action Buttons */}
+        <div className="mb-6 grid grid-cols-2 gap-3">
+          <Button
+            onClick={fetchProxies}
+            disabled={loading || checking}
+            className="gap-2"
+          >
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
+            دریافت لیست
+          </Button>
+
+          {!checking ? (
+            <Button
+              onClick={startChecking}
+              disabled={loading || proxies.length === 0}
+              variant="secondary"
+              className="gap-2"
+            >
+              <Play className="h-4 w-4" />
+              شروع بررسی
+            </Button>
+          ) : (
+            <Button onClick={stopChecking} variant="destructive" className="gap-2">
+              <Square className="h-4 w-4" />
+              توقف
+            </Button>
+          )}
+        </div>
+
+        {/* Error */}
+        {error && (
+          <div className="mb-6 flex items-center gap-2 rounded-xl bg-destructive/10 p-3 text-sm text-destructive">
+            <AlertCircle className="h-4 w-4 shrink-0" />
+            {error}
+          </div>
+        )}
+
+        {/* Stats */}
+        {proxies.length > 0 && (
+          <div className="mb-6 grid grid-cols-3 gap-3">
+            <Card>
+              <CardContent className="flex flex-col items-center py-4">
+                <span className="text-2xl font-bold text-foreground">
+                  {proxies.length}
+                </span>
+                <span className="text-xs text-muted-foreground">کل</span>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="flex flex-col items-center py-4">
+                <span className="text-2xl font-bold text-accent">
+                  {workingProxies.length}
+                </span>
+                <span className="text-xs text-muted-foreground">سالم</span>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="flex flex-col items-center py-4">
+                <span className="text-2xl font-bold text-destructive">
+                  {proxies.filter((p) => p.status === "failed").length}
+                </span>
+                <span className="text-xs text-muted-foreground">خراب</span>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Working Proxies */}
+        {workingProxies.length > 0 && (
+          <Card className="mb-6">
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Shield className="h-5 w-5 text-accent" />
+                پروکسی‌های سالم ({workingProxies.length})
+              </CardTitle>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={clearAll}
+                  className="h-8 gap-1 text-xs"
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={copyWorkingProxies}
+                  className="h-8 gap-1 text-xs"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="h-3 w-3" />
+                      کپی شد
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-3 w-3" />
+                      کپی همه
+                    </>
+                  )}
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="max-h-64 space-y-2 overflow-y-auto">
+                {workingProxies.map((proxy, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between rounded-xl bg-secondary/50 p-3"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Wifi className="h-4 w-4 text-accent" />
+                      <span className="font-mono text-xs text-foreground" dir="ltr">
+                        {proxy.server}:{proxy.port}
+                      </span>
+                    </div>
+                    <Badge
+                      variant="secondary"
+                      className="gap-1 bg-accent/10 text-accent"
+                    >
+                      <Clock className="h-3 w-3" />
+                      {proxy.ping}ms
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Proxy List Preview */}
+        {proxies.length > 0 && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="text-base">وضعیت بررسی</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="max-h-48 space-y-1.5 overflow-y-auto">
+                {proxies.slice(0, 50).map((proxy, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center justify-between rounded-lg bg-secondary/30 px-3 py-2"
+                  >
+                    <span className="font-mono text-xs text-muted-foreground" dir="ltr">
+                      {proxy.server}:{proxy.port}
+                    </span>
+                    {proxy.status === "pending" && (
+                      <Badge variant="secondary" className="text-xs">
+                        در انتظار
+                      </Badge>
+                    )}
+                    {proxy.status === "checking" && (
+                      <Badge className="gap-1 text-xs">
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                        بررسی
+                      </Badge>
+                    )}
+                    {proxy.status === "success" && (
+                      <Badge className="gap-1 bg-accent text-accent-foreground text-xs">
+                        <Wifi className="h-3 w-3" />
+                        {proxy.ping}ms
+                      </Badge>
+                    )}
+                    {proxy.status === "failed" && (
+                      <Badge variant="destructive" className="gap-1 text-xs">
+                        <WifiOff className="h-3 w-3" />
+                        خطا
+                      </Badge>
+                    )}
+                  </div>
+                ))}
+                {proxies.length > 50 && (
+                  <p className="text-center text-xs text-muted-foreground">
+                    و {proxies.length - 50} پروکسی دیگر...
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Console Logs */}
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center justify-between text-sm">
+              <span>لاگ‌ها</span>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() =>
+                  setLogs([
+                    { time: new Date().toLocaleTimeString("fa-IR"), message: "لاگ پاک شد." },
+                  ])
+                }
+                className="h-6 gap-1 px-2 text-xs"
+              >
+                <RefreshCw className="h-3 w-3" />
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="max-h-32 overflow-y-auto rounded-xl bg-black p-3 font-mono text-xs text-green-400" dir="ltr">
+              {logs.map((log, idx) => (
+                <div key={idx} className={log.isError ? "text-red-400" : ""}>
+                  [{log.time}] {log.message}
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </main>
+  );
+}
