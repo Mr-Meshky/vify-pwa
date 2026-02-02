@@ -1,5 +1,6 @@
 import { SubscriptionCard } from "@/components/subscription-card";
 import { AboutSection } from "@/components/about-section";
+import { DownloadApps } from "@/components/download-apps";
 import { Shield, Scan } from "lucide-react";
 import { LastCommitTime } from "@/components/last-commit-time";
 import Link from "next/link";
@@ -90,6 +91,11 @@ export default function Home() {
               />
             ))}
           </div>
+        </section>
+
+        {/* Download Apps Section */}
+        <section className="mb-6">
+          <DownloadApps />
         </section>
 
         {/* About Section */}
