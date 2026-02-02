@@ -69,7 +69,7 @@ export function SubscriptionCard({
     setError(null);
     try {
       const response = await fetch(
-        `/api/fetch-subscription?url=${encodeURIComponent(url)}`,
+        `/api/fetch-subscription?url=${encodeURIComponent(url)}`
       );
       if (!response.ok) throw new Error("خطا در دریافت محتوا");
       const data = await response.text();
@@ -223,7 +223,7 @@ export function SubscriptionCard({
                   {getSelectedCount()} از {configCount}
                 </span>
               </div>
-              
+
               {/* Selection Buttons */}
               <div className="flex flex-wrap gap-2">
                 {[
@@ -231,6 +231,8 @@ export function SubscriptionCard({
                   { label: "۵۰ تایی", value: "50" },
                   { label: "۱۰۰ تایی", value: "100" },
                   { label: "۱۵۰ تایی", value: "150" },
+                  { label: "۱۵۰ تایی", value: "300" },
+                  { label: "۵۰۰ تایی", value: "500" },
                 ].map((option) => (
                   <button
                     key={option.value}
@@ -259,7 +261,7 @@ export function SubscriptionCard({
                   >
                     قبلی
                   </Button>
-                  
+
                   <div className="flex items-center gap-1.5">
                     <span className="font-mono text-xs text-muted-foreground">
                       صفحه
@@ -271,11 +273,15 @@ export function SubscriptionCard({
                       از {getTotalPages()}
                     </span>
                   </div>
-                  
+
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => setCurrentPage((p) => Math.min(getTotalPages() - 1, p + 1))}
+                    onClick={() =>
+                      setCurrentPage((p) =>
+                        Math.min(getTotalPages() - 1, p + 1)
+                      )
+                    }
                     disabled={currentPage >= getTotalPages() - 1}
                     className="h-8 rounded-lg px-3 text-xs"
                   >
