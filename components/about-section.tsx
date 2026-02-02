@@ -29,7 +29,7 @@ export function AboutSection() {
         <ChevronDown
           className={cn(
             "h-5 w-5 text-muted-foreground transition-transform duration-300",
-            isOpen && "rotate-180",
+            isOpen && "rotate-180"
           )}
         />
       </button>
@@ -38,7 +38,7 @@ export function AboutSection() {
       <div
         className={cn(
           "grid transition-all duration-300 ease-in-out",
-          isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
+          isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
         )}
       >
         <div className="overflow-hidden">
@@ -86,17 +86,28 @@ export function AboutSection() {
               <ol className="list-inside list-decimal space-y-2 text-sm text-muted-foreground marker:text-primary">
                 <li>یکی از سابسکریپشن‌ها را انتخاب کنید</li>
                 <li>لینک را کپی کنید یا QR Code را اسکن کنید</li>
-                <li>
-                  لینک را در کلاینت V2Ray خود اضافه کنید
-                </li>
+                <li>لینک را در کلاینت V2Ray خود اضافه کنید</li>
                 <li>از اینترنت آزاد لذت ببرید!</li>
               </ol>
 
               <p className="pt-2 text-sm text-muted-foreground">
                 برای دانلود برنامه‌های مناسب هر سیستم‌عامل، بخش
-                <span className="text-foreground font-medium"> دانلود برنامه‌ها </span>
+                <span className="text-foreground font-medium">
+                  {" "}
+                  دانلود برنامه‌ها{" "}
+                </span>
                 را ببینید.
               </p>
+            </div>
+            <div className="space-y-3">
+              <a
+                className="text-[#0088cc] font-medium underline"
+                href="https://mrmeshky.ir/blog/what-is-vify"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                ویفای چیست؟ بیشتر بدانید
+              </a>
             </div>
 
             {/* Links */}
