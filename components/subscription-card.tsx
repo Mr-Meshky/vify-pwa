@@ -49,8 +49,8 @@ export function SubscriptionCard({
   const [expanded, setExpanded] = useState(false);
   const [showQR, setShowQR] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [rangeStart, setRangeStart] = useState(0);
-  const [rangeEnd, setRangeEnd] = useState(150);
+  const [pageSize, setPageSize] = useState<number | "all">("all");
+  const [currentPage, setCurrentPage] = useState(0);
 
   const copyUrl = async () => {
     await navigator.clipboard.writeText(url);
@@ -92,17 +92,33 @@ export function SubscriptionCard({
   const getSelectedConfigs = () => {
     if (!content) return "";
     const lines = content.split("\n").filter((line) => line.trim().length > 0);
-    const maxEnd = Math.min(rangeEnd, lines.length);
-    const start = Math.min(rangeStart, maxEnd);
-    return lines.slice(start, maxEnd).join("\n");
+    if (pageSize === "all") return lines.join("\n");
+    const start = currentPage * pageSize;
+    const end = Math.min(start + pageSize, lines.length);
+    return lines.slice(start, end).join("\n");
   };
 
   const getSelectedCount = () => {
     if (!content) return 0;
     const lines = content.split("\n").filter((line) => line.trim().length > 0);
-    const maxEnd = Math.min(rangeEnd, lines.length);
-    const start = Math.min(rangeStart, maxEnd);
-    return maxEnd - start;
+    if (pageSize === "all") return lines.length;
+    const start = currentPage * pageSize;
+    const end = Math.min(start + pageSize, lines.length);
+    return end - start;
+  };
+
+  const getTotalPages = () => {
+    if (!configCount || pageSize === "all") return 1;
+    return Math.ceil(configCount / pageSize);
+  };
+
+  const handlePageSizeChange = (value: string) => {
+    if (value === "all") {
+      setPageSize("all");
+    } else {
+      setPageSize(parseInt(value));
+    }
+    setCurrentPage(0);
   };
 
   const copyContent = async () => {
@@ -197,83 +213,76 @@ export function SubscriptionCard({
         {/* Expanded Content */}
         {expanded && content && (
           <div className="border-t border-border/50 bg-secondary/20 p-4">
-            {/* Range Selector */}
+            {/* Page Size Selector */}
             <div className="mb-4 rounded-xl bg-background/50 p-3">
-              <div className="mb-2 flex items-center justify-between">
+              <div className="mb-3 flex items-center justify-between">
                 <span className="text-xs font-medium text-foreground">
-                  انتخاب محدوده
+                  تعداد کانفیگ
                 </span>
                 <span className="rounded-lg bg-primary/10 px-2 py-1 font-mono text-xs text-primary">
                   {getSelectedCount()} از {configCount}
                 </span>
               </div>
               
-              <div className="flex items-center gap-2">
-                <div className="flex flex-1 items-center gap-2">
-                  <input
-                    type="number"
-                    value={rangeStart}
-                    onChange={(e) => setRangeStart(Math.max(0, parseInt(e.target.value) || 0))}
-                    className="w-16 rounded-lg border border-border bg-background px-2 py-1.5 text-center font-mono text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                    min={0}
-                    max={configCount || 0}
-                  />
-                  <div className="flex-1">
-                    <input
-                      type="range"
-                      value={rangeStart}
-                      onChange={(e) => setRangeStart(parseInt(e.target.value))}
-                      className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-border accent-primary"
-                      min={0}
-                      max={configCount || 150}
-                    />
-                  </div>
-                </div>
-                
-                <span className="text-muted-foreground">-</span>
-                
-                <div className="flex flex-1 items-center gap-2">
-                  <div className="flex-1">
-                    <input
-                      type="range"
-                      value={rangeEnd}
-                      onChange={(e) => setRangeEnd(parseInt(e.target.value))}
-                      className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-border accent-primary"
-                      min={0}
-                      max={configCount || 150}
-                    />
-                  </div>
-                  <input
-                    type="number"
-                    value={rangeEnd}
-                    onChange={(e) => setRangeEnd(Math.min(configCount || 150, parseInt(e.target.value) || 0))}
-                    className="w-16 rounded-lg border border-border bg-background px-2 py-1.5 text-center font-mono text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                    min={0}
-                    max={configCount || 150}
-                  />
-                </div>
-              </div>
-              
-              {/* Quick Select Buttons */}
-              <div className="mt-3 flex flex-wrap gap-1.5">
+              {/* Selection Buttons */}
+              <div className="flex flex-wrap gap-2">
                 {[
-                  { label: "همه", start: 0, end: configCount || 150 },
-                  { label: "50 اول", start: 0, end: 50 },
-                  { label: "100 اول", start: 0, end: 100 },
-                  { label: "150 اول", start: 0, end: 150 },
-                ].map((preset) => (
+                  { label: "همه", value: "all" },
+                  { label: "۵۰ تایی", value: "50" },
+                  { label: "۱۰۰ تایی", value: "100" },
+                  { label: "۱۵۰ تایی", value: "150" },
+                ].map((option) => (
                   <button
-                    key={preset.label}
-                    onClick={() => {
-                      setRangeStart(preset.start);
-                      setRangeEnd(Math.min(preset.end, configCount || preset.end));
-                    }}
-                    className="rounded-lg bg-secondary px-2.5 py-1 text-xs text-secondary-foreground transition-colors hover:bg-secondary/80 active:scale-95"
+                    key={option.value}
+                    onClick={() => handlePageSizeChange(option.value)}
+                    className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all active:scale-95 ${
+                      (pageSize === "all" && option.value === "all") ||
+                      pageSize.toString() === option.value
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                    }`}
                   >
-                    {preset.label}
+                    {option.label}
                   </button>
                 ))}
               </div>
+
+              {/* Pagination Controls */}
+              {pageSize !== "all" && getTotalPages() > 1 && (
+                <div className="mt-3 flex items-center justify-between rounded-lg bg-secondary/50 p-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
+                    disabled={currentPage === 0}
+                    className="h-8 rounded-lg px-3 text-xs"
+                  >
+                    قبلی
+                  </Button>
+                  
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono text-xs text-muted-foreground">
+                      صفحه
+                    </span>
+                    <span className="rounded-md bg-background px-2 py-0.5 font-mono text-xs font-medium text-foreground">
+                      {currentPage + 1}
+                    </span>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      از {getTotalPages()}
+                    </span>
+                  </div>
+                  
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setCurrentPage((p) => Math.min(getTotalPages() - 1, p + 1))}
+                    disabled={currentPage >= getTotalPages() - 1}
+                    className="h-8 rounded-lg px-3 text-xs"
+                  >
+                    بعدی
+                  </Button>
+                </div>
+              )}
             </div>
 
             <div className="mb-3 flex items-center justify-between">
