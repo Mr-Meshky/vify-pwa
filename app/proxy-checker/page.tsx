@@ -49,12 +49,52 @@ interface CheckedProxy extends ProxyData {
 
 const PROXY_SOURCES = [
   {
-    name: "Telegram Proxy No.1",
+    name: "Telegram Proxy 1",
     url: "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/TELEGRAM_PROXY_SUB/refs/heads/main/telegram_proxy_no1.txt",
   },
   {
-    name: "Telegram Proxy No.2",
+    name: "Telegram Proxy 2",
     url: "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/TELEGRAM_PROXY_SUB/refs/heads/main/telegram_proxy_no2.txt",
+  },
+  {
+    name: "Telegram Proxy 3",
+    url: "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/TELEGRAM_PROXY_SUB/refs/heads/main/telegram_proxy_no3.txt",
+  },
+  {
+    name: "Telegram Proxy 4",
+    url: "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/TELEGRAM_PROXY_SUB/refs/heads/main/telegram_proxy_no4.txt",
+  },
+  {
+    name: "Telegram Proxy 5",
+    url: "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/TELEGRAM_PROXY_SUB/refs/heads/main/telegram_proxy_no5.txt",
+  },
+  {
+    name: "Telegram Proxy 6",
+    url: "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/TELEGRAM_PROXY_SUB/refs/heads/main/telegram_proxy_no6.txt",
+  },
+  {
+    name: "Telegram Proxy 7",
+    url: "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/TELEGRAM_PROXY_SUB/refs/heads/main/telegram_proxy_no7.txt",
+  },
+  {
+    name: "Telegram Proxy 8",
+    url: "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/TELEGRAM_PROXY_SUB/refs/heads/main/telegram_proxy_no8.txt",
+  },
+  {
+    name: "Telegram Proxy 9",
+    url: "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/TELEGRAM_PROXY_SUB/refs/heads/main/telegram_proxy_no9.txt",
+  },
+  {
+    name: "Telegram Proxy 10",
+    url: "https://raw.githubusercontent.com/V2RAYCONFIGSPOOL/TELEGRAM_PROXY_SUB/refs/heads/main/telegram_proxy_no10.txt",
+  },
+  {
+    name: "Telegram Proxy 11",
+    url: "https://raw.githubusercontent.com/Argh94/Proxy-List/refs/heads/main/MTProto.txt",
+  },
+  {
+    name: "Telegram Proxy 12",
+    url: "https://raw.githubusercontent.com/SoliSpirit/mtproto/master/all_proxies.txt",
   },
 ];
 
@@ -68,8 +108,13 @@ export default function ProxyCheckerPage() {
   const [copied, setCopied] = useState(false);
   const [progress, setProgress] = useState(0);
   const [statusText, setStatusText] = useState("آماده برای شروع...");
-  const [logs, setLogs] = useState<{ time: string; message: string; isError?: boolean }[]>([
-    { time: new Date().toLocaleTimeString("fa-IR"), message: "سیستم آماده است." },
+  const [logs, setLogs] = useState<
+    { time: string; message: string; isError?: boolean }[]
+  >([
+    {
+      time: new Date().toLocaleTimeString("fa-IR"),
+      message: "سیستم آماده است.",
+    },
   ]);
   const [channels, setChannels] = useState("");
   const [messageCount, setMessageCount] = useState(5);
@@ -245,7 +290,15 @@ export default function ProxyCheckerPage() {
   };
 
   // Enhanced proxy check with multiple tests
-  const checkProxy = async (proxy: ProxyData): Promise<{ ok: boolean; ping?: number; avgPing?: number; jitter?: number; testCount?: number }> => {
+  const checkProxy = async (
+    proxy: ProxyData
+  ): Promise<{
+    ok: boolean;
+    ping?: number;
+    avgPing?: number;
+    jitter?: number;
+    testCount?: number;
+  }> => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
 
@@ -321,12 +374,18 @@ export default function ProxyCheckerPage() {
               testCount: result.testCount,
             };
             working.push(checkedProxy);
-            addLog(`سالم: ${proxy.server}:${proxy.port} | Ping: ${result.avgPing}ms | Jitter: ${result.jitter}ms`);
+            addLog(
+              `سالم: ${proxy.server}:${proxy.port} | Ping: ${result.avgPing}ms | Jitter: ${result.jitter}ms`
+            );
             return { idx, proxy: checkedProxy };
           } else {
             return {
               idx,
-              proxy: { ...proxy, status: "failed" as const, error: "اتصال ناموفق" },
+              proxy: {
+                ...proxy,
+                status: "failed" as const,
+                error: "اتصال ناموفق",
+              },
             };
           }
         })
@@ -346,7 +405,12 @@ export default function ProxyCheckerPage() {
       setProgress(progressPercent);
       setStatusText(`${completed} / ${total} | سالم: ${working.length}`);
       // Sort by average ping
-      setWorkingProxies([...working].sort((a, b) => (a.avgPing || a.ping || 9999) - (b.avgPing || b.ping || 9999)));
+      setWorkingProxies(
+        [...working].sort(
+          (a, b) =>
+            (a.avgPing || a.ping || 9999) - (b.avgPing || b.ping || 9999)
+        )
+      );
     }
 
     setChecking(false);
@@ -366,9 +430,7 @@ export default function ProxyCheckerPage() {
   const copyWorkingProxies = async () => {
     if (workingProxies.length === 0) return;
 
-    const text = workingProxies
-      .map((p) => `${p.original}`)
-      .join("\n\n");
+    const text = workingProxies.map((p) => `${p.original}`).join("\n\n");
 
     await navigator.clipboard.writeText(text);
     setCopied(true);
@@ -380,7 +442,12 @@ export default function ProxyCheckerPage() {
     setWorkingProxies([]);
     setProgress(0);
     setStatusText("آماده برای شروع...");
-    setLogs([{ time: new Date().toLocaleTimeString("fa-IR"), message: "سیستم پاک شد." }]);
+    setLogs([
+      {
+        time: new Date().toLocaleTimeString("fa-IR"),
+        message: "سیستم پاک شد.",
+      },
+    ]);
   };
 
   return (
@@ -414,14 +481,23 @@ export default function ProxyCheckerPage() {
         {/* Beta Alert */}
         <Alert className="mb-6 border-amber-500/50 bg-amber-500/10">
           <FlaskConical className="h-4 w-4 text-amber-500" />
-          <AlertTitle className="text-amber-600 dark:text-amber-400">نسخه آزمایشی (Beta)</AlertTitle>
+          <AlertTitle className="text-amber-600 dark:text-amber-400">
+            نسخه آزمایشی (Beta)
+          </AlertTitle>
           <AlertDescription className="text-amber-600/80 dark:text-amber-400/80">
-            این بخش در حال توسعه است. نتایج تست ممکن است با عملکرد واقعی متفاوت باشد و صددرصد تضمینی نیست. تست از سرور انجام می‌شود و ممکن است با اینترنت شما تفاوت داشته باشد.
+            این بخش در حال توسعه است. نتایج تست ممکن است با عملکرد واقعی متفاوت
+            باشد و صددرصد تضمینی نیست. تست از سرور انجام می‌شود و ممکن است با
+            اینترنت شما تفاوت داشته باشد.
           </AlertDescription>
         </Alert>
 
         {/* Tabs for Auto/Manual */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="mb-6"
+          dir="rtl"
+        >
           <TabsList className="w-full">
             <TabsTrigger value="auto" className="flex-1 gap-2">
               <Zap className="h-4 w-4" />
@@ -446,9 +522,15 @@ export default function ProxyCheckerPage() {
                   پروکسی‌ها از منابع معتبر GitHub دریافت و تست می‌شوند.
                 </p>
                 <div className="rounded-lg bg-secondary/50 p-3">
-                  <p className="mb-2 text-xs font-medium text-muted-foreground">منابع:</p>
+                  <p className="mb-2 text-xs font-medium text-muted-foreground">
+                    منابع:
+                  </p>
                   {PROXY_SOURCES.map((source, idx) => (
-                    <div key={idx} className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <div
+                      key={idx}
+                      dir="ltr"
+                      className="flex items-center gap-2 text-xs text-muted-foreground"
+                    >
                       <Shield className="h-3 w-3 text-primary" />
                       {source.name}
                     </div>
@@ -557,11 +639,18 @@ export default function ProxyCheckerPage() {
           <Card className="mb-6">
             <CardContent className="py-4">
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-sm font-medium text-foreground">پیشرفت تست</span>
-                <span className="text-sm text-muted-foreground">{progress}%</span>
+                <span className="text-sm font-medium text-foreground">
+                  پیشرفت تست
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  {progress}%
+                </span>
               </div>
               <Progress value={progress} className="h-2" />
-              <p className="mt-2 text-center text-xs text-muted-foreground" dir="ltr">
+              <p
+                className="mt-2 text-center text-xs text-muted-foreground"
+                dir="ltr"
+              >
                 {statusText}
               </p>
             </CardContent>
@@ -581,7 +670,11 @@ export default function ProxyCheckerPage() {
                 شروع تست
               </Button>
             ) : (
-              <Button onClick={stopChecking} variant="destructive" className="gap-2">
+              <Button
+                onClick={stopChecking}
+                variant="destructive"
+                className="gap-2"
+              >
                 <Square className="h-4 w-4" />
                 توقف
               </Button>
@@ -671,7 +764,10 @@ export default function ProxyCheckerPage() {
                   >
                     <div className="flex items-center gap-2">
                       <Wifi className="h-4 w-4 shrink-0 text-accent" />
-                      <span className="break-all font-mono text-xs text-foreground" dir="ltr">
+                      <span
+                        className="break-all font-mono text-xs text-foreground"
+                        dir="ltr"
+                      >
                         {proxy.server}:{proxy.port}
                       </span>
                     </div>
@@ -693,10 +789,7 @@ export default function ProxyCheckerPage() {
                         </Badge>
                       )}
                       {proxy.testCount && (
-                        <Badge
-                          variant="outline"
-                          className="gap-1 text-xs"
-                        >
+                        <Badge variant="outline" className="gap-1 text-xs">
                           {proxy.testCount}x
                         </Badge>
                       )}
@@ -721,7 +814,10 @@ export default function ProxyCheckerPage() {
                     key={idx}
                     className="flex items-center justify-between rounded-lg bg-secondary/30 px-3 py-2"
                   >
-                    <span className="truncate font-mono text-xs text-muted-foreground" dir="ltr">
+                    <span
+                      className="truncate font-mono text-xs text-muted-foreground"
+                      dir="ltr"
+                    >
                       {proxy.server}:{proxy.port}
                     </span>
                     {proxy.status === "pending" && (
@@ -742,7 +838,10 @@ export default function ProxyCheckerPage() {
                       </Badge>
                     )}
                     {proxy.status === "failed" && (
-                      <Badge variant="destructive" className="shrink-0 gap-1 text-xs">
+                      <Badge
+                        variant="destructive"
+                        className="shrink-0 gap-1 text-xs"
+                      >
                         <WifiOff className="h-3 w-3" />
                         خطا
                       </Badge>
@@ -769,7 +868,10 @@ export default function ProxyCheckerPage() {
                 variant="ghost"
                 onClick={() =>
                   setLogs([
-                    { time: new Date().toLocaleTimeString("fa-IR"), message: "لاگ پاک شد." },
+                    {
+                      time: new Date().toLocaleTimeString("fa-IR"),
+                      message: "لاگ پاک شد.",
+                    },
                   ])
                 }
                 className="h-6 gap-1 px-2 text-xs"
@@ -779,7 +881,7 @@ export default function ProxyCheckerPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="max-h-32 overflow-y-auto rounded-xl bg-black p-3 font-mono text-xs text-green-400" dir="ltr">
+            <div className="max-h-32 overflow-y-auto rounded-xl bg-black p-3 font-vazirmatin text-xs text-green-400">
               {logs.map((log, idx) => (
                 <div key={idx} className={log.isError ? "text-red-400" : ""}>
                   [{log.time}] {log.message}
