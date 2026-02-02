@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 
 interface AppItem {
   name: string;
-  description: string;
+  description?: string;
   directDownload?: string;
   storeLink?: string;
   storeName?: string;
@@ -32,24 +32,26 @@ const platforms: PlatformApps[] = [
     icon: <Smartphone className="h-5 w-5" />,
     apps: [
       {
-        name: "Hiddify",
-        description: "بهترین انتخاب برای اندروید",
-        directDownload: "#",
-        storeLink: "https://play.google.com/store/apps/details?id=app.hiddify.com",
+        name: "V2Box",
+        description: "کلاینت محبوب و سبک",
+        storeLink:
+          "https://play.google.com/store/apps/details?id=dev.hexasoftware.v2box",
         storeName: "Google Play",
         recommended: true,
       },
       {
-        name: "V2RayNG",
-        description: "کلاینت محبوب و سبک",
-        directDownload: "#",
-        storeLink: "https://play.google.com/store/apps/details?id=com.v2ray.ang",
+        name: "Hiddify",
+        description: "بهترین انتخاب برای اندروید",
+        storeLink:
+          "https://play.google.com/store/apps/details?id=app.hiddify.com",
         storeName: "Google Play",
       },
+
       {
-        name: "NekoBox",
-        description: "پشتیبانی از پروتکل‌های متنوع",
-        directDownload: "#",
+        name: "v2RayTun",
+        storeLink:
+          "https://play.google.com/store/apps/details?id=com.v2raytun.android",
+        storeName: "Google Play",
       },
     ],
   },
@@ -58,22 +60,22 @@ const platforms: PlatformApps[] = [
     icon: <Apple className="h-5 w-5" />,
     apps: [
       {
+        name: "V2Box",
+        description: "رابط کاربری زیبا",
+        storeLink: "https://apps.apple.com/app/v2box-v2ray-client/id6446814690",
+        storeName: "App Store",
+        recommended: true,
+      },
+      {
         name: "Hiddify",
         description: "رایگان و قدرتمند",
         storeLink: "https://apps.apple.com/app/hiddify-proxy-vpn/id6596777532",
         storeName: "App Store",
-        recommended: true,
       },
       {
         name: "NPV Tunnel",
         description: "کلاینت ساده و کاربردی",
         storeLink: "https://apps.apple.com/app/npv-tunnel/id1629465476",
-        storeName: "App Store",
-      },
-      {
-        name: "V2Box",
-        description: "رابط کاربری زیبا",
-        storeLink: "https://apps.apple.com/app/v2box-v2ray-client/id6446814690",
         storeName: "App Store",
       },
       {
@@ -84,52 +86,54 @@ const platforms: PlatformApps[] = [
       },
     ],
   },
-  {
-    platform: "Windows",
-    icon: <Monitor className="h-5 w-5" />,
-    apps: [
-      {
-        name: "Hiddify",
-        description: "بهترین انتخاب برای ویندوز",
-        directDownload: "#",
-        recommended: true,
-      },
-      {
-        name: "V2RayN",
-        description: "کلاینت کلاسیک و محبوب",
-        directDownload: "#",
-      },
-      {
-        name: "Nekoray",
-        description: "رابط کاربری مدرن",
-        directDownload: "#",
-      },
-    ],
-  },
-  {
-    platform: "macOS",
-    icon: <Apple className="h-5 w-5" />,
-    apps: [
-      {
-        name: "Hiddify",
-        description: "بهترین انتخاب برای مک",
-        directDownload: "#",
-        recommended: true,
-      },
-      {
-        name: "V2RayU",
-        description: "کلاینت ساده برای مک",
-        directDownload: "#",
-      },
-    ],
-  },
+  // {
+  //   platform: "Windows",
+  //   icon: <Monitor className="h-5 w-5" />,
+  //   apps: [
+  //     {
+  //       name: "Hiddify",
+  //       description: "بهترین انتخاب برای ویندوز",
+  //       directDownload: "#",
+  //       recommended: true,
+  //     },
+  //     {
+  //       name: "V2RayN",
+  //       description: "کلاینت کلاسیک و محبوب",
+  //       directDownload: "#",
+  //     },
+  //     {
+  //       name: "Nekoray",
+  //       description: "رابط کاربری مدرن",
+  //       directDownload: "#",
+  //     },
+  //   ],
+  // },
+  // {
+  //   platform: "macOS",
+  //   icon: <Apple className="h-5 w-5" />,
+  //   apps: [
+  //     {
+  //       name: "Hiddify",
+  //       description: "بهترین انتخاب برای مک",
+  //       directDownload: "#",
+  //       recommended: true,
+  //     },
+  //     {
+  //       name: "V2RayU",
+  //       description: "کلاینت ساده برای مک",
+  //       directDownload: "#",
+  //     },
+  //   ],
+  // },
 ];
 
 export function DownloadApps() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPlatform, setSelectedPlatform] = useState<string>("Android");
 
-  const currentPlatform = platforms.find((p) => p.platform === selectedPlatform);
+  const currentPlatform = platforms.find(
+    (p) => p.platform === selectedPlatform
+  );
 
   return (
     <div className="rounded-2xl border border-border/50 bg-card/50 overflow-hidden">
@@ -193,7 +197,9 @@ export function DownloadApps() {
                   <div className="mb-2 flex items-start justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className="font-medium text-foreground">{app.name}</h4>
+                        <h4 className="font-medium text-foreground">
+                          {app.name}
+                        </h4>
                         {app.recommended && (
                           <span className="rounded-md bg-primary/20 px-1.5 py-0.5 text-[10px] font-medium text-primary">
                             پیشنهادی
