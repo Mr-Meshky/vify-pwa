@@ -4,6 +4,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import Script from "next/script";
 import { Metadata, Viewport } from "next";
 import "./globals.css";
+import { AboutSection } from "@/components/about-section";
 
 const vazirmatn = Vazirmatn({
   subsets: ["arabic"],
@@ -50,7 +51,19 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="fa" dir="rtl">
       <body className={`${vazirmatn.variable} font-sans antialiased`}>
         {children}
-        
+        <div className="mx-auto max-w-2xl px-4 pb-6">
+          {/* About Section */}
+          <section className="mb-6">
+            <AboutSection />
+          </section>
+
+          {/* Install PWA Hint */}
+          <footer className="rounded-2xl border border-dashed border-border/50 bg-secondary/20 p-4 text-center">
+            <p className="text-xs text-muted-foreground">
+              برای نصب به صورت اپلیکیشن: منوی مرورگر {">"} Add to Home Screen
+            </p>
+          </footer>
+        </div>
 
         <Script
           strategy="afterInteractive"
@@ -85,7 +98,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             `,
           }}
         />
-        
+
         <Analytics />
         <SpeedInsights />
       </body>

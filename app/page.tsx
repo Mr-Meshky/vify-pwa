@@ -99,21 +99,9 @@ export default function Home() {
         </section>
 
         {/* Download Apps Section */}
-        <section className="mb-6">
+        <section>
           <DownloadApps />
         </section>
-
-        {/* About Section */}
-        <section className="mb-6">
-          <AboutSection />
-        </section>
-
-        {/* Install PWA Hint */}
-        <footer className="rounded-2xl border border-dashed border-border/50 bg-secondary/20 p-4 text-center">
-          <p className="text-xs text-muted-foreground">
-            برای نصب به صورت اپلیکیشن: منوی مرورگر {">"} Add to Home Screen
-          </p>
-        </footer>
       </div>
     </main>
   );
