@@ -87,43 +87,16 @@ export function AboutSection() {
                 <li>یکی از سابسکریپشن‌ها را انتخاب کنید</li>
                 <li>لینک را کپی کنید یا QR Code را اسکن کنید</li>
                 <li>
-                  لینک را در کلاینت V2Ray خود اضافه کنید (V2Box, V2RayNG,
-                  Shadowrocket و...)
+                  لینک را در کلاینت V2Ray خود اضافه کنید
                 </li>
                 <li>از اینترنت آزاد لذت ببرید!</li>
               </ol>
 
-              <div className="pt-2 space-y-2 text-sm text-muted-foreground">
-                <p>
-                  🔹 چون تست پینگ گرفتن از این تعداد کانفیگ سخته، برای تست و
-                  استفاده
-                  <span className="text-foreground font-medium">
-                    {" "}
-                    Hiddify، NekoBox یا Nekoray
-                  </span>{" "}
-                  پیشنهاد میشه. مخزن به‌صورت مرتب آپدیت میشه.
-                </p>
-
-                <p>
-                  🔸 در آیفون (iOS) می‌تونید از
-                  <span className="text-foreground font-medium"> Hiddify </span>
-                  یا
-                  <span className="text-foreground font-medium">
-                    {" "}
-                    NPV Tunnel{" "}
-                  </span>
-                  استفاده کنید (پیشنهادی).
-                </p>
-
-                <p>
-                  🔺 در ویندوز،
-                  <span className="text-foreground font-medium">
-                    {" "}
-                    Hiddify، V2RayN یا Nekoray
-                  </span>{" "}
-                  گزینه‌های مناسبی هستن.
-                </p>
-              </div>
+              <p className="pt-2 text-sm text-muted-foreground">
+                برای دانلود برنامه‌های مناسب هر سیستم‌عامل، بخش
+                <span className="text-foreground font-medium"> دانلود برنامه‌ها </span>
+                را ببینید.
+              </p>
             </div>
 
             {/* Links */}

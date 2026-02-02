@@ -3,23 +3,16 @@
 import useSWR from "swr";
 import { Clock } from "lucide-react";
 
-const GITHUB_API_URL =
-  "https://api.github.com/repos/Mr-Meshky/vify/commits?per_page=1";
-
-interface Commit {
-  commit: {
-    committer: {
-      date: string;
-    };
-  };
+interface CommitData {
+  date: string;
+  message?: string;
 }
 
 const fetcher = (url: string) =>
-  fetch(url, {
-    headers: {
-      "Cache-Control": "public, max-age=3600",
-    },
-  }).then((res) => res.json());
+  fetch(url).then((res) => {
+    if (!res.ok) throw new Error("Failed to fetch");
+    return res.json();
+  });
 
 function formatPersianDate(dateString: string): string {
   const date = new Date(dateString);
@@ -39,12 +32,16 @@ function formatPersianDate(dateString: string): string {
 }
 
 export function LastCommitTime() {
-  const { data, error, isLoading } = useSWR<Commit[]>(GITHUB_API_URL, fetcher, {
-    revalidateOnFocus: false,
-    revalidateOnReconnect: false,
-    refreshInterval: 0,
-    dedupingInterval: 60 * 60 * 1000,
-  });
+  const { data, error, isLoading } = useSWR<CommitData>(
+    "/api/last-commit",
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      refreshInterval: 0,
+      dedupingInterval: 60 * 60 * 1000,
+    }
+  );
 
   if (isLoading) {
     return (
@@ -55,10 +52,9 @@ export function LastCommitTime() {
     );
   }
 
-  if (error || !data?.[0]) return null;
+  if (error || !data?.date) return null;
 
-  const lastCommitDate = data[0].commit.committer.date;
-  const formattedDate = formatPersianDate(lastCommitDate);
+  const formattedDate = formatPersianDate(data.date);
 
   return (
     <div className="flex items-center gap-1.5 text-xs text-muted-foreground/80">
