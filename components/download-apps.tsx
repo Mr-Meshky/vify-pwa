@@ -32,12 +32,20 @@ const platforms: PlatformApps[] = [
     icon: <Smartphone className="h-5 w-5" />,
     apps: [
       {
+        name: "Happ - Proxy Utility",
+        directDownload:
+          "https://github.com/Happ-proxy/happ-android/releases/latest/download/Happ.apk",
+        storeLink:
+          "https://play.google.com/store/apps/details?id=com.happproxy",
+        storeName: "Google Play",
+        recommended: true,
+      },
+      {
         name: "V2Box",
         description: "کلاینت محبوب و سبک",
         storeLink:
           "https://play.google.com/store/apps/details?id=dev.hexasoftware.v2box",
         storeName: "Google Play",
-        recommended: true,
       },
       {
         name: "Hiddify",
@@ -46,7 +54,6 @@ const platforms: PlatformApps[] = [
           "https://play.google.com/store/apps/details?id=app.hiddify.com",
         storeName: "Google Play",
       },
-
       {
         name: "v2RayTun",
         storeLink:
@@ -60,12 +67,19 @@ const platforms: PlatformApps[] = [
     icon: <Apple className="h-5 w-5" />,
     apps: [
       {
+        name: "Happ - Proxy Utility",
+        storeLink:
+          "https://apps.apple.com/us/app/happ-proxy-utility/id6504287215",
+        storeName: "App Store",
+        recommended: true,
+      },
+      {
         name: "V2Box",
         description: "رابط کاربری زیبا",
         storeLink: "https://apps.apple.com/app/v2box-v2ray-client/id6446814690",
         storeName: "App Store",
-        recommended: true,
       },
+
       {
         name: "Hiddify",
         description: "رایگان و قدرتمند",
@@ -86,45 +100,39 @@ const platforms: PlatformApps[] = [
       },
     ],
   },
-  // {
-  //   platform: "Windows",
-  //   icon: <Monitor className="h-5 w-5" />,
-  //   apps: [
-  //     {
-  //       name: "Hiddify",
-  //       description: "بهترین انتخاب برای ویندوز",
-  //       directDownload: "#",
-  //       recommended: true,
-  //     },
-  //     {
-  //       name: "V2RayN",
-  //       description: "کلاینت کلاسیک و محبوب",
-  //       directDownload: "#",
-  //     },
-  //     {
-  //       name: "Nekoray",
-  //       description: "رابط کاربری مدرن",
-  //       directDownload: "#",
-  //     },
-  //   ],
-  // },
-  // {
-  //   platform: "macOS",
-  //   icon: <Apple className="h-5 w-5" />,
-  //   apps: [
-  //     {
-  //       name: "Hiddify",
-  //       description: "بهترین انتخاب برای مک",
-  //       directDownload: "#",
-  //       recommended: true,
-  //     },
-  //     {
-  //       name: "V2RayU",
-  //       description: "کلاینت ساده برای مک",
-  //       directDownload: "#",
-  //     },
-  //   ],
-  // },
+  {
+    platform: "Windows",
+    icon: <Monitor className="h-5 w-5" />,
+    apps: [
+      {
+        name: "Happ - Proxy Utility",
+        description: "بهترین انتخاب برای ویندوز",
+        directDownload:
+          "https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x86.exe",
+        recommended: true,
+      },
+    ],
+  },
+  {
+    platform: "macOS",
+    icon: <Apple className="h-5 w-5" />,
+    apps: [
+      {
+        name: "Happ - Proxy Utility",
+        storeLink:
+          "https://apps.apple.com/us/app/happ-proxy-utility/id6504287215",
+        storeName: "App Store",
+        recommended: true,
+      },
+      {
+        name: "V2Box - V2ray Client",
+        description: "بهترین انتخاب برای مک",
+        storeLink:
+          "https://apps.apple.com/us/app/v2box-v2ray-client/id6446814690",
+        storeName: "App Store",
+      },
+    ],
+  },
 ];
 
 export function DownloadApps() {
