@@ -5,6 +5,7 @@ import Script from "next/script";
 import { Metadata, Viewport } from "next";
 import "./globals.css";
 import { AboutSection } from "@/components/about-section";
+import { BASE_URL } from "@/lib/utils";
 
 const vazirmatn = Vazirmatn({
   subsets: ["arabic"],
@@ -34,12 +35,12 @@ export const metadata: Metadata = {
   ],
   generator: "mrmeshky.ir",
   manifest: "/manifest.json",
-  metadataBase: new URL("https://vify.ir"),
+  metadataBase: new URL(BASE_URL),
   openGraph: {
     title: "Vify - سابسکریپشن V2Ray و وب پروکسی رایگان",
     description:
       "مجموعه کامل سابسکریپشن‌های V2Ray، وب پروکسی رایگان و ابزارهای کاربردی برای دسترسی امن به اینترنت",
-    url: "https://vify.ir",
+    url: BASE_URL,
     siteName: "Vify",
     locale: "fa_IR",
     type: "website",
@@ -84,7 +85,7 @@ export const metadata: Metadata = {
     apple: "/android-chrome-192x192.png",
   },
   alternates: {
-    canonical: "https://vify.ir",
+    canonical: BASE_URL,
   },
 };
 

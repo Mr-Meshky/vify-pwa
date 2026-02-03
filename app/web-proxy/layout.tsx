@@ -1,3 +1,4 @@
+import { BASE_URL } from "@/lib/utils";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
     description: "دسترسی امن و ناشناس به سایت‌های مسدود شده",
   },
   alternates: {
-    canonical: "https://vify.ir/web-proxy",
+    canonical: `${BASE_URL}/web-proxy`,
   },
   robots: {
     index: true,

@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/api/"],
       },
     ],
-    sitemap: "https://vify.ir/sitemap.xml",
+    sitemap: "https://vify.mrmeshky.ir/sitemap.xml",
   };
 }

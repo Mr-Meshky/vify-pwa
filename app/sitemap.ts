@@ -1,7 +1,8 @@
+import { BASE_URL } from "@/lib/utils";
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://vify.ir";
+  const baseUrl = BASE_URL;
   const currentDate = new Date();
 
   return [

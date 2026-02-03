@@ -1,3 +1,4 @@
+import { BASE_URL } from "@/lib/utils";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
     siteName: "Vify",
   },
   alternates: {
-    canonical: "https://vify.ir/scanner",
+    canonical: `${BASE_URL}/scanner`,
   },
   robots: {
     index: true,
