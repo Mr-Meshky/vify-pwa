@@ -10,7 +10,7 @@ export async function GET() {
         Accept: "application/vnd.github.v3+json",
         "User-Agent": "Vify-PWA",
       },
-      next: { revalidate: 3600 }, // Cache for 1 hour
+      next: { revalidate: 1800 }, // Cache for 1 hour
     });
 
     if (!response.ok) {
