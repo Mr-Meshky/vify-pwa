@@ -101,7 +101,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="fa" dir="rtl">
       <body className={`${vazirmatn.variable} font-sans antialiased`}>
         {children}
-        <div className="mx-auto max-w-2xl px-4 pb-6">
+        <div className="mx-auto max-w-2xl px-4 py-6">
           {/* About Section */}
           <section className="mb-6">
             <AboutSection />

@@ -1,7 +1,6 @@
 import { SubscriptionCard } from "@/components/subscription-card";
-import { AboutSection } from "@/components/about-section";
 import { DownloadApps } from "@/components/download-apps";
-import { Shield, Scan, Wifi, Globe } from "lucide-react";
+import { Scan, Wifi, Globe } from "lucide-react";
 import { LastCommitTime } from "@/components/last-commit-time";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -49,7 +48,7 @@ const subscriptions = [
 export default function Home() {
   return (
     <main className="min-h-screen bg-background pb-safe">
-      <div className="mx-auto max-w-2xl px-4 py-6">
+      <div className="mx-auto max-w-2xl px-4 pt-6">
         {/* Header */}
         <header className="mb-8">
           <div className="flex items-center justify-between">
@@ -99,9 +98,9 @@ export default function Home() {
             <LastCommitTime />
           </div>
           <div className="space-y-3">
-            {subscriptions.map((sub, index) => (
+            {subscriptions.map((sub) => (
               <SubscriptionCard
-                key={index}
+                key={sub.url}
                 name={sub.name}
                 url={sub.url}
                 icon={sub.icon}
