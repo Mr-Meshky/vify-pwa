@@ -12,10 +12,57 @@ const vazirmatn = Vazirmatn({
 });
 
 export const metadata: Metadata = {
-  title: "Vify",
-  description: "مجموعه سابسکریپشن‌های V2Ray",
+  title: {
+    default: "Vify - سابسکریپشن V2Ray و وب پروکسی رایگان",
+    template: "%s | Vify",
+  },
+  description:
+    "مجموعه کامل سابسکریپشن‌های V2Ray، وب پروکسی رایگان، اسکنر کانفیگ و پروکسی تلگرام. دسترسی امن و سریع به اینترنت آزاد.",
+  keywords: [
+    "V2Ray",
+    "سابسکریپشن V2Ray",
+    "فیلترشکن",
+    "وب پروکسی",
+    "پروکسی رایگان",
+    "VMess",
+    "VLESS",
+    "Trojan",
+    "Shadowsocks",
+    "کانفیگ V2Ray",
+    "اسکنر تلگرام",
+    "پروکسی تلگرام",
+  ],
   generator: "mrmeshky.ir",
   manifest: "/manifest.json",
+  metadataBase: new URL("https://vify.ir"),
+  openGraph: {
+    title: "Vify - سابسکریپشن V2Ray و وب پروکسی رایگان",
+    description:
+      "مجموعه کامل سابسکریپشن‌های V2Ray، وب پروکسی رایگان و ابزارهای کاربردی برای دسترسی امن به اینترنت",
+    url: "https://vify.ir",
+    siteName: "Vify",
+    locale: "fa_IR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Vify - سابسکریپشن V2Ray و وب پروکسی رایگان",
+    description: "مجموعه کامل سابسکریپشن‌های V2Ray و ابزارهای کاربردی",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: "your-google-verification-code",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -35,6 +82,9 @@ export const metadata: Metadata = {
       },
     ],
     apple: "/android-chrome-192x192.png",
+  },
+  alternates: {
+    canonical: "https://vify.ir",
   },
 };
 

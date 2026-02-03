@@ -1,7 +1,7 @@
 import { SubscriptionCard } from "@/components/subscription-card";
 import { AboutSection } from "@/components/about-section";
 import { DownloadApps } from "@/components/download-apps";
-import { Shield, Scan, Wifi } from "lucide-react";
+import { Shield, Scan, Wifi, Globe } from "lucide-react";
 import { LastCommitTime } from "@/components/last-commit-time";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -67,11 +67,17 @@ export default function Home() {
                 <h1 className="text-2xl font-bold text-foreground">Vify</h1>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
+              <Link href="/web-proxy">
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Globe className="h-4 w-4" />
+                  وب پروکسی
+                </Button>
+              </Link>
               <Link href="/proxy-checker">
                 <Button variant="outline" size="sm" className="gap-2">
                   <Wifi className="h-4 w-4" />
-                  اسکنر پروکسی
+                  پروکسی تلگرام
                 </Button>
               </Link>
               <Link href="/scanner">
