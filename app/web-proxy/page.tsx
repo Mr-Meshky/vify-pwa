@@ -109,12 +109,15 @@ export default function WebProxyPage() {
 
   const validateUrl = (inputUrl: string): string | null => {
     let processedUrl = inputUrl.trim();
-    
+
     // Add protocol if missing
-    if (!processedUrl.startsWith("http://") && !processedUrl.startsWith("https://")) {
+    if (
+      !processedUrl.startsWith("http://") &&
+      !processedUrl.startsWith("https://")
+    ) {
       processedUrl = "https://" + processedUrl;
     }
-    
+
     try {
       const urlObj = new URL(processedUrl);
       if (!urlObj.hostname.includes(".")) {
@@ -202,7 +205,9 @@ export default function WebProxyPage() {
                 />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">وب پروکسی</h1>
+                <h1 className="text-2xl font-bold text-foreground">
+                  وب پروکسی
+                </h1>
                 <p className="text-sm text-muted-foreground">
                   گشت‌وگذار امن و ناشناس
                 </p>
@@ -239,7 +244,7 @@ export default function WebProxyPage() {
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    className="h-12 pe-12 text-base"
+                    className="h-12 pe-12 text-base ps-10"
                     dir="ltr"
                   />
                   <Globe className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
@@ -314,7 +319,12 @@ export default function WebProxyPage() {
                           <Copy className="h-4 w-4" />
                         )}
                       </Button>
-                      <Button variant="outline" size="icon" className="shrink-0" asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="shrink-0"
+                        asChild
+                      >
                         <a
                           href={result.proxyUrl}
                           target="_blank"
@@ -377,7 +387,12 @@ export default function WebProxyPage() {
                     >
                       <Copy className="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="icon" className="shrink-0" asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="shrink-0"
+                      asChild
+                    >
                       <a
                         href={proxy.proxyUrl}
                         target="_blank"
@@ -435,9 +450,7 @@ export default function WebProxyPage() {
                     1
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">
-                      درخواست کاربر
-                    </p>
+                    <p className="font-medium text-foreground">درخواست کاربر</p>
                     <p className="text-sm text-muted-foreground">
                       آدرس سایت مورد نظر را وارد می‌کنید
                     </p>
@@ -461,9 +474,7 @@ export default function WebProxyPage() {
                     3
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">
-                      ارسال پاسخ
-                    </p>
+                    <p className="font-medium text-foreground">ارسال پاسخ</p>
                     <p className="text-sm text-muted-foreground">
                       محتوا به مرورگر شما ارسال می‌شود در حالی که IP شما مخفی
                       است
@@ -479,9 +490,7 @@ export default function WebProxyPage() {
         <section className="mb-8">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">
-                مقایسه وب پروکسی با VPN
-              </CardTitle>
+              <CardTitle className="text-lg">مقایسه وب پروکسی با VPN</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
@@ -519,7 +528,9 @@ export default function WebProxyPage() {
                       </td>
                     </tr>
                     <tr>
-                      <td className="py-3 pe-4 text-foreground">سرعت راه‌اندازی</td>
+                      <td className="py-3 pe-4 text-foreground">
+                        سرعت راه‌اندازی
+                      </td>
                       <td className="py-3 px-4 text-center text-green-500">
                         فوری
                       </td>

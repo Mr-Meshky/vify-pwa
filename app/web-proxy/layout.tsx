@@ -49,8 +49,6 @@ export const metadata: Metadata = {
 
 export default function WebProxyLayout({
   children,
-}: {
-  children: React.ReactNode;
-}) {
+}: LayoutProps<"/web-proxy">) {
   return children;
 }

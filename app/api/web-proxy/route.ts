@@ -5,27 +5,34 @@ const PROXY_SERVICES = [
   {
     name: "CroxyProxy",
     baseUrl: "https://www.croxyproxy.com/proxy",
-    formatUrl: (url: string) => `https://www.croxyproxy.com/proxy?url=${encodeURIComponent(url)}`,
+    formatUrl: (url: string) =>
+      `https://www.croxyproxy.com/proxy?url=${encodeURIComponent(url)}`,
   },
   {
     name: "ProxySite",
     baseUrl: "https://www.proxysite.com/go.php",
-    formatUrl: (url: string) => `https://www.proxysite.com/go.php?d=${encodeURIComponent(url)}`,
+    formatUrl: (url: string) =>
+      `https://www.proxysite.com/go.php?d=${encodeURIComponent(url)}`,
   },
   {
     name: "Hide.me",
     baseUrl: "https://hide.me/en/proxy",
-    formatUrl: (url: string) => `https://hide.me/en/proxy?url=${encodeURIComponent(url)}`,
+    formatUrl: (url: string) =>
+      `https://hide.me/en/proxy?url=${encodeURIComponent(url)}`,
   },
   {
     name: "4everproxy",
     baseUrl: "https://www.4everproxy.com/direct",
-    formatUrl: (url: string) => `https://www.4everproxy.com/direct?u=${encodeURIComponent(url)}`,
+    formatUrl: (url: string) =>
+      `https://www.4everproxy.com/direct?u=${encodeURIComponent(url)}`,
   },
   {
     name: "FilterBypass",
     baseUrl: "https://www.filterbypass.me/index.php",
-    formatUrl: (url: string) => `https://www.filterbypass.me/index.php?q=${Buffer.from(url).toString('base64')}`,
+    formatUrl: (url: string) =>
+      `https://www.filterbypass.me/index.php?q=${Buffer.from(url).toString(
+        "base64"
+      )}`,
   },
 ];
 
