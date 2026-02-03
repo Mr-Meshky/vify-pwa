@@ -20,6 +20,7 @@ import {
   MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface CategoryResult {
   protocol: Record<string, string[]>;
@@ -163,8 +164,14 @@ export default function ScannerPage() {
         <header className="mb-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 shadow-lg shadow-primary/10">
-                <Shield className="h-8 w-8 text-primary" />
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 shadow-lg shadow-primary/10 aspect-square">
+                <Image
+                  src="/android-chrome-512x512.png"
+                  alt="Vify"
+                  width={32}
+                  height={32}
+                  className="size-8"
+                />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-foreground">
