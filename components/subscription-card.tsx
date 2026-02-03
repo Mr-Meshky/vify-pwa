@@ -49,7 +49,7 @@ export function SubscriptionCard({
   const [expanded, setExpanded] = useState(false);
   const [showQR, setShowQR] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [pageSize, setPageSize] = useState<number | "all">("all");
+  const [pageSize, setPageSize] = useState<number | "all">(100);
   const [currentPage, setCurrentPage] = useState(0);
 
   const copyUrl = async () => {
