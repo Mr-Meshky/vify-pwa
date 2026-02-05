@@ -59,9 +59,9 @@ export async function POST(req: NextRequest) {
       success: true,
       proxyUrl: finalUrl,
     });
-  } catch {
+  } catch (err) {
     return NextResponse.json(
-      { error: "خطا در پردازش درخواست" },
+      { error: "خطا در پردازش درخواست", err },
       { status: 500 },
     );
   }
