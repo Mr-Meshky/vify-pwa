@@ -5,4 +5,4 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const BASE_URL = process.env.NEXT_PUBLIC_FRONT_URL;
+export const BASE_URL = process.env.ALLOWED_ORIGIN;
