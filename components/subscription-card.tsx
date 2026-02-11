@@ -1,7 +1,5 @@
 "use client";
 
-import React from "react";
-
 import { useState } from "react";
 import {
   Copy,
@@ -10,7 +8,6 @@ import {
   Loader2,
   QrCode,
   X,
-  ChevronDown,
   ChevronUp,
   Shield,
   Zap,
@@ -40,7 +37,7 @@ export function SubscriptionCard({
   url,
   icon,
   description,
-}: SubscriptionCardProps) {
+}: Readonly<SubscriptionCardProps>) {
   const [copied, setCopied] = useState(false);
   const [contentCopied, setContentCopied] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -49,7 +46,7 @@ export function SubscriptionCard({
   const [expanded, setExpanded] = useState(false);
   const [showQR, setShowQR] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [pageSize, setPageSize] = useState<number | "all">("all");
+  const [pageSize, setPageSize] = useState<number | "all">(100);
   const [currentPage, setCurrentPage] = useState(0);
 
   const copyUrl = async () => {
@@ -69,7 +66,7 @@ export function SubscriptionCard({
     setError(null);
     try {
       const response = await fetch(
-        `/api/fetch-subscription?url=${encodeURIComponent(url)}`
+        `/api/fetch-subscription?url=${encodeURIComponent(url)}`,
       );
       if (!response.ok) throw new Error("خطا در دریافت محتوا");
       const data = await response.text();
@@ -279,7 +276,7 @@ export function SubscriptionCard({
                     size="sm"
                     onClick={() =>
                       setCurrentPage((p) =>
-                        Math.min(getTotalPages() - 1, p + 1)
+                        Math.min(getTotalPages() - 1, p + 1),
                       )
                     }
                     disabled={currentPage >= getTotalPages() - 1}

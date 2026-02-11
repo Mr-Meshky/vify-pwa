@@ -140,7 +140,7 @@ export function DownloadApps() {
   const [selectedPlatform, setSelectedPlatform] = useState<string>("Android");
 
   const currentPlatform = platforms.find(
-    (p) => p.platform === selectedPlatform
+    (p) => p.platform === selectedPlatform,
   );
 
   return (
@@ -157,7 +157,7 @@ export function DownloadApps() {
         <ChevronDown
           className={cn(
             "h-5 w-5 text-muted-foreground transition-transform duration-300",
-            isOpen && "rotate-180"
+            isOpen && "rotate-180",
           )}
         />
       </button>
@@ -166,7 +166,7 @@ export function DownloadApps() {
       <div
         className={cn(
           "grid transition-all duration-300 ease-in-out",
-          isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+          isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
         )}
       >
         <div className="overflow-hidden">
@@ -181,7 +181,7 @@ export function DownloadApps() {
                     "flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium transition-all active:scale-95",
                     selectedPlatform === platform.platform
                       ? "bg-primary text-primary-foreground"
-                      : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                      : "bg-secondary text-secondary-foreground hover:bg-secondary/80",
                   )}
                 >
                   {platform.icon}
@@ -199,7 +199,7 @@ export function DownloadApps() {
                     "rounded-xl border p-3 transition-colors",
                     app.recommended
                       ? "border-primary/30 bg-primary/5"
-                      : "border-border/50 bg-background/50"
+                      : "border-border/50 bg-background/50",
                   )}
                 >
                   <div className="mb-2 flex items-start justify-between">

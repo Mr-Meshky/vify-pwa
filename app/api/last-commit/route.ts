@@ -10,7 +10,7 @@ export async function GET() {
         Accept: "application/vnd.github.v3+json",
         "User-Agent": "Vify-PWA",
       },
-      next: { revalidate: 1800 }, // Cache for 1 hour
+      next: { revalidate: 900 }, // Cache for 15 minutes
     });
 
     if (!response.ok) {
@@ -19,10 +19,10 @@ export async function GET() {
 
     const data = await response.json();
 
-    if (!data || !data[0]?.commit?.committer?.date) {
+    if (!data?.[0]?.commit?.committer?.date) {
       return NextResponse.json(
         { error: "No commit data found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -34,7 +34,7 @@ export async function GET() {
     console.error("Error fetching commit:", error);
     return NextResponse.json(
       { error: "Failed to fetch commit data" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

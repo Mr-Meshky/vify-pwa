@@ -1,7 +1,6 @@
 import { SubscriptionCard } from "@/components/subscription-card";
-import { AboutSection } from "@/components/about-section";
 import { DownloadApps } from "@/components/download-apps";
-import { Shield, Scan, Wifi } from "lucide-react";
+import { Scan, Wifi, Globe } from "lucide-react";
 import { LastCommitTime } from "@/components/last-commit-time";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -49,7 +48,7 @@ const subscriptions = [
 export default function Home() {
   return (
     <main className="min-h-screen bg-background pb-safe">
-      <div className="mx-auto max-w-2xl px-4 py-6">
+      <div className="mx-auto max-w-2xl px-4 pt-6">
         {/* Header */}
         <header className="mb-8">
           <div className="flex items-center justify-between">
@@ -67,11 +66,17 @@ export default function Home() {
                 <h1 className="text-2xl font-bold text-foreground">Vify</h1>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
+              {/* <Link href="/web-proxy">
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Globe className="h-4 w-4" />
+                  وب پروکسی
+                </Button>
+              </Link> */}
               <Link href="/proxy-checker">
                 <Button variant="outline" size="sm" className="gap-2">
                   <Wifi className="h-4 w-4" />
-                  اسکنر پروکسی
+                  پروکسی تلگرام
                 </Button>
               </Link>
               <Link href="/scanner">
@@ -93,9 +98,9 @@ export default function Home() {
             <LastCommitTime />
           </div>
           <div className="space-y-3">
-            {subscriptions.map((sub, index) => (
+            {subscriptions.map((sub) => (
               <SubscriptionCard
-                key={index}
+                key={sub.url}
                 name={sub.name}
                 url={sub.url}
                 icon={sub.icon}

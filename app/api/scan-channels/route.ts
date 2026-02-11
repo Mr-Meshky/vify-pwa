@@ -266,7 +266,7 @@ async function checkIP(ipaddress: string): Promise<{
     const timeoutId = setTimeout(() => controller.abort(), 5000);
     const response = await fetch(
       `https://www.irjh.top/py/check/ip.php?ip=${ipaddress}`,
-      { signal: controller.signal }
+      { signal: controller.signal },
     );
     clearTimeout(timeoutId);
 
@@ -300,7 +300,7 @@ async function vmessHandle(input: string, messageId: string): Promise<Result> {
 async function configChanger(
   urlString: string,
 
-  messageId: string
+  messageId: string,
 ): Promise<FinalResult | null> {
   try {
     const protocol = urlString.split("://")[0];
@@ -322,7 +322,7 @@ async function configChanger(
         urlString.split("#")[0] +
         "#" +
         encodeURIComponent(
-          `${flag} @MrMeshkyChannel ${crypto.randomInt(100000, 999999)}`
+          `${flag} @MrMeshkyChannel ${crypto.randomInt(100000, 999999)}`,
         );
     }
 
@@ -335,9 +335,13 @@ async function configChanger(
 async function fetchChannelConfigs(
   channel: string,
   result: CategoryResult,
-  messageCount: number = DEFAULT_MESSAGE_COUNT
+  messageCount: number = DEFAULT_MESSAGE_COUNT,
 ): Promise<void> {
+  // Original URL
   const url = `https://t.me/s/${channel}`;
+
+  // This URL works at a slower speed on an Iranian server.
+  // const url = `https://t-me.translate.goog/s/${channel}?_x_tr_sl=en&_x_tr_tl=fa&_x_tr_hl=en&_x_tr_pto=wapp`;
 
   try {
     const controller = new AbortController();
@@ -376,7 +380,7 @@ async function fetchChannelConfigs(
 
     const lastConfigs = matches.slice(-messageCount);
     const lastMessageIds = messageIds.slice(
-      -Math.max(messageIds.length, lastConfigs.length)
+      -Math.max(messageIds.length, lastConfigs.length),
     );
 
     let configIndex = 0;
@@ -427,7 +431,7 @@ function withCORS(res: NextResponse, origin: string | null) {
     res.headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.headers.set(
       "Access-Control-Allow-Headers",
-      "Content-Type, x-vify-client"
+      "Content-Type, x-vify-client",
     );
   }
   return res;
@@ -458,7 +462,7 @@ export async function POST(request: NextRequest) {
     if (client !== REQUIRED_CLIENT_VALUE) {
       return NextResponse.json(
         { error: "Unauthorized client" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -466,16 +470,16 @@ export async function POST(request: NextRequest) {
     const channels: string[] = body.channels;
     const messageCount: number = Math.min(
       50,
-      Math.max(1, body.messageCount || DEFAULT_MESSAGE_COUNT)
+      Math.max(1, body.messageCount || DEFAULT_MESSAGE_COUNT),
     );
 
     if (!channels || !Array.isArray(channels) || channels.length === 0) {
       return withCORS(
         NextResponse.json(
           { error: "channels array is required" },
-          { status: 400 }
+          { status: 400 },
         ),
-        origin
+        origin,
       );
     }
 
@@ -483,9 +487,9 @@ export async function POST(request: NextRequest) {
       return withCORS(
         NextResponse.json(
           { error: "Maximum 20 channels allowed per request" },
-          { status: 400 }
+          { status: 400 },
         ),
-        origin
+        origin,
       );
     }
 
@@ -514,12 +518,12 @@ export async function POST(request: NextRequest) {
           errors: result.errors.length,
         },
       }),
-      origin
+      origin,
     );
   } catch {
     return NextResponse.json(
       { error: "Failed to process request" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

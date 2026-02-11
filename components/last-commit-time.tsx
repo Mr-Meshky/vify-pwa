@@ -40,7 +40,7 @@ export function LastCommitTime() {
       revalidateOnReconnect: false,
       refreshInterval: 0,
       dedupingInterval: 60 * 60 * 1000,
-    }
+    },
   );
 
   if (isLoading) {
