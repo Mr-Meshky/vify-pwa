@@ -67,12 +67,12 @@ export default function Home() {
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Link href="/web-proxy">
+              {/* <Link href="/web-proxy">
                 <Button variant="outline" size="sm" className="gap-2">
                   <Globe className="h-4 w-4" />
                   وب پروکسی
                 </Button>
-              </Link>
+              </Link> */}
               <Link href="/proxy-checker">
                 <Button variant="outline" size="sm" className="gap-2">
                   <Wifi className="h-4 w-4" />
