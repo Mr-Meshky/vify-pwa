@@ -228,7 +228,7 @@ export function SubscriptionCard({
                   { label: "۵۰ تایی", value: "50" },
                   { label: "۱۰۰ تایی", value: "100" },
                   { label: "۱۵۰ تایی", value: "150" },
-                  { label: "۱۵۰ تایی", value: "300" },
+                  { label: "۳۰۰ تایی", value: "300" },
                   { label: "۵۰۰ تایی", value: "500" },
                 ].map((option) => (
                   <button
